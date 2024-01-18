@@ -10,6 +10,8 @@
 
 .MemberList li {
     list-style-type: none;
+    margin: 4px 0;
+    padding: 4px 0;
 }
 
 .Checkbox {
