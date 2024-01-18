@@ -1,19 +1,27 @@
 import { useEffect, useState } from 'react';
-import { collection, getDocs, getFirestore } from 'firebase/firestore';
+import { collection, documentId, getDocs, getFirestore, where, query } from 'firebase/firestore';
 import useGoogler from './useGoogler';
 import { Member } from './member';
 
-export default function useMembers() {
-    const user = useGoogler();
+interface UseMembersProps {
+    selectedMemberIds?: Set<string>;
+}
+
+export default function useMembers({ selectedMemberIds }: UseMembersProps = {}) {
+    const { googler } = useGoogler();
     const [members, setMembers] = useState<Member[]>([]);
 
     useEffect(() => {
-        if (user == null) {
+        if (googler == null) {
             setMembers([]);
             return;
         }
 
-        getDocs(collection(getFirestore(), 'googlers')).then(snapshot => {
+        const c = collection(getFirestore(), 'googlers');
+        const q = selectedMemberIds ?
+            query(collection(getFirestore(), 'googlers'), where(documentId(), 'in', Array.from(selectedMemberIds))) :
+            c;
+        getDocs(q).then(snapshot => {
             const members: Member[] = [];
             snapshot.forEach(doc => {
                 members.push({
@@ -23,7 +31,7 @@ export default function useMembers() {
             });
             setMembers(members);
         });
-    }, [user]);
+    }, [googler, selectedMemberIds]);
 
     return members;
 }

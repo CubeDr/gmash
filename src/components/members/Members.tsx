@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import styles from './Members.module.css';
 import useMembers from '../../useMembers';
+import { Member } from '../../member';
 
 interface MembersProps {
     mode: 'view' | 'select';
@@ -9,6 +10,7 @@ interface MembersProps {
 
 export default function Members({ mode, onSelectedMemberIdsChange }: MembersProps) {
     const members = useMembers();
+    // const members: Member[] = [];
     const selectedMemberIds = useRef(new Set<String>());
 
     return (

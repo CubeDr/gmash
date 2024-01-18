@@ -5,12 +5,14 @@ import useGoogler from '../../useGoogler';
 import Members from '../../components/members/Members';
 import { doc, getFirestore, setDoc } from 'firebase/firestore';
 import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function HomePage() {
   const { googler, refetch } = useGoogler();
   const [isSelectingMember, setIsSelectingMember] = useState(false);
   const [selectedMembersCount, setSelectedMembersCount] = useState(0);
   const selectedMemberIds = useRef(new Set<String>());
+  const navigate = useNavigate();
 
   function showMembers() {
     return googler != null;
@@ -68,7 +70,11 @@ export default function HomePage() {
     setSelectedMembersCount(newSelectedMemberIds.size);
   }
 
-  function proceed() {}
+  function proceed() {
+    navigate('/session', {
+        state: selectedMemberIds.current,
+    });
+  }
 
   return (
     <div className={styles.HomePage}>
