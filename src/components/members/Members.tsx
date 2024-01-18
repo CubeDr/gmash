@@ -2,12 +2,7 @@ import { useEffect, useState } from 'react';
 import useGoogler from '../../useGoogler';
 import { collection, getDocs, getFirestore } from 'firebase/firestore';
 import styles from './Members.module.css';
-
-interface Member {
-    id: string;
-    name: string;
-    elo: number;
-}
+import { Member } from '../../member';
 
 export default function Members() {
     const user = useGoogler();

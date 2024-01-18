@@ -1,12 +1,7 @@
 import { getAuth, onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-
-interface Googler {
-  user: User;
-  name?: string;
-  elo?: number;
-}
+import { Googler } from './googler';
 
 export default function useGoogler() {
   const [user, setUser] = useState<User | null>(null);

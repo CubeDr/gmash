@@ -1,5 +1,5 @@
 import styles from './App.module.css';
-import { getAuth, signInWithPopup, signOut, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import googleSignIn from './google_signin.png';
 import useGoogler from './useGoogler';
 import Members from './components/members/Members';
@@ -18,6 +18,10 @@ function App() {
 
   function showRegisterButton() {
     return googler != null && googler.name == null;
+  }
+
+  function showStartSessionButton() {
+    return googler?.role === 'organizer';
   }
 
   function signIn() {
@@ -41,6 +45,7 @@ function App() {
     setDoc(doc(getFirestore(), 'googlers', googler.user.uid), {
       name: googler.user.displayName,
       elo: 1000,
+      role: 'member',
     }).then(() => {
       refetch();
     });
@@ -52,6 +57,7 @@ function App() {
       {showMembers() && <Members />}
       {showSignInButton() && <img className={styles.GoogleSignIn} src={googleSignIn} onClick={signIn} />}
       {showRegisterButton() && <button className={styles.Button} onClick={(e) => register()}>Register</button>}
+      {showStartSessionButton() && <button className={styles.Button} onClick={(e) => {}}>Start Session</button>}
     </div>
   );
 }
