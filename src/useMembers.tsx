@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { collection, getDocs, getFirestore } from 'firebase/firestore';
 import useGoogler from './useGoogler';
 import { Member } from './member';

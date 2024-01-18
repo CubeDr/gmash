@@ -7,7 +7,7 @@ interface MembersProps {
     onSelectedMemberIdsChange?: (selectedMemberIds: Set<String>) => void;
 }
 
-export default function Members({ mode, onSelectedMemberIdsChange: onSelectedMemberIdsChange }: MembersProps) {
+export default function Members({ mode, onSelectedMemberIdsChange }: MembersProps) {
     const members = useMembers();
     const selectedMemberIds = useRef(new Set<String>());
 
