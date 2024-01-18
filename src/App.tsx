@@ -4,9 +4,13 @@ import googleSignIn from './google_signin.png';
 import useGoogler from './useGoogler';
 import Members from './components/members/Members';
 import { doc, getFirestore, setDoc } from 'firebase/firestore';
+import { useRef, useState } from 'react';
 
 function App() {
   const { googler, refetch } = useGoogler();
+  const [isSelectingMember, setIsSelectingMember] = useState(false);
+  const [selectedMembersCount, setSelectedMembersCount] = useState(0);
+  const selectedMemberIds = useRef(new Set<String>());
 
   function showMembers() {
     return googler != null;
@@ -21,7 +25,11 @@ function App() {
   }
 
   function showStartSessionButton() {
-    return googler?.role === 'organizer';
+    return googler?.role === 'organizer' && !isSelectingMember;
+  }
+
+  function showProceedButton() {
+    return googler?.role === 'organizer' && isSelectingMember;
   }
 
   function signIn() {
@@ -51,13 +59,31 @@ function App() {
     });
   }
 
+  function startSession() {
+    setIsSelectingMember(true);
+  }
+
+  function onSelectedMemberIdsChange(newSelectedMemberIds: Set<String>) {
+    selectedMemberIds.current = newSelectedMemberIds;
+    setSelectedMembersCount(newSelectedMemberIds.size);
+  }
+
+  function proceed() {}
+
   return (
     <div className={styles.App}>
       <div className={styles.Title}>GMASH</div>
-      {showMembers() && <div className={styles.MembersContainer}><Members /></div>}
+      {showMembers() &&
+        <div className={styles.MembersContainer}>
+          <Members
+            mode={isSelectingMember ? 'select' : 'view'}
+            onSelectedMemberIdsChange={onSelectedMemberIdsChange} />
+        </div>
+      }
       {showSignInButton() && <img className={styles.GoogleSignIn} src={googleSignIn} onClick={signIn} />}
       {showRegisterButton() && <button className={styles.Button} onClick={(e) => register()}>Register</button>}
-      {showStartSessionButton() && <button className={styles.Button} onClick={(e) => {}}>Start Session</button>}
+      {showStartSessionButton() && <button className={styles.Button} onClick={(e) => startSession()}>Start Session</button>}
+      {showProceedButton() && <button className={styles.Button} onClick={(e) => proceed()}>Proceed with {selectedMembersCount} members</button>}
     </div>
   );
 }

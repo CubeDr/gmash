@@ -1,30 +1,15 @@
-import { useEffect, useState } from 'react';
-import useGoogler from '../../useGoogler';
-import { collection, getDocs, getFirestore } from 'firebase/firestore';
+import { useEffect, useRef, useState } from 'react';
 import styles from './Members.module.css';
-import { Member } from '../../member';
+import useMembers from '../../useMembers';
 
-export default function Members() {
-    const user = useGoogler();
-    const [members, setMembers] = useState<Member[]>([]);
+interface MembersProps {
+    mode: 'view' | 'select';
+    onSelectedMemberIdsChange?: (selectedMemberIds: Set<String>) => void;
+}
 
-    useEffect(() => {
-        if (user == null) {
-            setMembers([]);
-            return;
-        }
-
-        getDocs(collection(getFirestore(), 'googlers')).then(snapshot => {
-            const members: Member[] = [];
-            snapshot.forEach(doc => {
-                members.push({
-                    id: doc.id,
-                    ...doc.data(),
-                } as Member);
-            });
-            setMembers(members);
-        });
-    }, [user]);
+export default function Members({ mode, onSelectedMemberIdsChange: onSelectedMemberIdsChange }: MembersProps) {
+    const members = useMembers();
+    const selectedMemberIds = useRef(new Set<String>());
 
     return (
         <div className={styles.Members}>
@@ -32,7 +17,22 @@ export default function Members() {
             <ol className={styles.MemberList}>
                 {
                     members.map(member => (
-                        <li key={member.id}>{member.name} - {member.elo}</li>
+                        <li key={member.id}>
+                            {mode === 'select' &&
+                                <input type='checkbox' id={member.id} className={styles.Checkbox} onChange={(e) => {
+                                    if (e.target.checked) {
+                                        selectedMemberIds.current.add(member.id);
+                                    } else {
+                                        selectedMemberIds.current.delete(member.id);
+                                    }
+                                    
+                                    if (onSelectedMemberIdsChange) {
+                                        onSelectedMemberIdsChange(selectedMemberIds.current);
+                                    }
+                                }} />
+                            }
+                            <label className={styles.Label} htmlFor={member.id}>{member.name} - {member.elo}</label>
+                        </li>
                     ))
                 }
             </ol>

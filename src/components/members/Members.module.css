@@ -11,3 +11,14 @@
 .MemberList li {
     list-style-type: none;
 }
+
+.Checkbox {
+    height: 15px;
+    margin-left: -18px;
+    vertical-align: middle;
+    width: 15px;
+}
+
+.Label {
+    vertical-align: middle;
+}
