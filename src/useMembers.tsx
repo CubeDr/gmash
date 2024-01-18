@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { collection, documentId, getDocs, getFirestore, where, query } from 'firebase/firestore';
 import useGoogler from './useGoogler';
-import { Member } from './member';
+import { Member } from './data/member';
 
 interface UseMembersProps {
     selectedMemberIds?: Set<string>;

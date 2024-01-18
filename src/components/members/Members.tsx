@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import styles from './Members.module.css';
 import useMembers from '../../useMembers';
-import { Member } from '../../member';
+import { Member } from '../../data/member';
 
 interface MembersProps {
     mode: 'view' | 'select';
