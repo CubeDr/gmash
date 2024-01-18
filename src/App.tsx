@@ -1,11 +1,24 @@
 import styles from './App.module.css';
 import { getAuth, signInWithPopup, signOut, GoogleAuthProvider } from 'firebase/auth';
 import googleSignIn from './google_signin.png';
-import useUser from './useUser';
+import useGoogler from './useGoogler';
 import Members from './components/members/Members';
+import { doc, getFirestore, setDoc } from 'firebase/firestore';
 
 function App() {
-  const user = useUser();
+  const { googler, refetch } = useGoogler();
+
+  function showMembers() {
+    return googler != null;
+  }
+
+  function showSignInButton() {
+    return googler == null;
+  }
+
+  function showRegisterButton() {
+    return googler != null && googler.name == null;
+  }
 
   function signIn() {
     const auth = getAuth();
@@ -20,12 +33,25 @@ function App() {
     signInWithPopup(auth, provider);
   }
 
+  function register() {
+    if (googler == null) {
+      return;
+    }
+
+    setDoc(doc(getFirestore(), 'googlers', googler.user.uid), {
+      name: googler.user.displayName,
+      elo: 1000,
+    }).then(() => {
+      refetch();
+    });
+  }
+
   return (
     <div className={styles.App}>
       <div className={styles.Title}>GMASH</div>
-      {user && <Members />}
-      {!user && <img className={styles.GoogleSignIn} src={googleSignIn} onClick={signIn} />}
-      {user && <button className={styles.Button} onClick={(e) => signOut(getAuth())}>Register</button>}
+      {showMembers() && <Members />}
+      {showSignInButton() && <img className={styles.GoogleSignIn} src={googleSignIn} onClick={signIn} />}
+      {showRegisterButton() && <button className={styles.Button} onClick={(e) => register()}>Register</button>}
     </div>
   );
 }

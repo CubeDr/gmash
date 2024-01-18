@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import useUser from '../../useUser';
+import useGoogler from '../../useGoogler';
 import { collection, getDocs, getFirestore } from 'firebase/firestore';
 import styles from './Members.module.css';
 
@@ -10,7 +10,7 @@ interface Member {
 }
 
 export default function Members() {
-    const user = useUser();
+    const user = useGoogler();
     const [members, setMembers] = useState<Member[]>([]);
 
     useEffect(() => {
@@ -19,7 +19,7 @@ export default function Members() {
             return;
         }
 
-        getDocs(collection(getFirestore(), 'users')).then(snapshot => {
+        getDocs(collection(getFirestore(), 'googlers')).then(snapshot => {
             const members: Member[] = [];
             snapshot.forEach(doc => {
                 members.push({
