@@ -1,28 +1,13 @@
-import { useEffect, useState } from 'react';
 import styles from './App.module.css';
-import { getAuth, signInWithPopup, signOut, GoogleAuthProvider, User, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, signInWithPopup, signOut, GoogleAuthProvider } from 'firebase/auth';
 import googleSignIn from './google_signin.png';
+import useUser from './useUser';
+import Members from './components/members/Members';
 
 function App() {
-  const [user, setUser] = useState<User | null>(null);
+  const user = useUser();
 
-  useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user != null) {
-        if (!user.email?.endsWith('google.com')) {
-          alert('Only google.com emails are available.');
-          signOut(auth);
-          return;
-        }
-      }
-      setUser(user);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  async function signIn() {
+  function signIn() {
     const auth = getAuth();
     if (auth.currentUser != null) {
       return;
@@ -32,15 +17,15 @@ function App() {
     provider.setCustomParameters({
       prompt: 'select_account'
     });
-    const result = await signInWithPopup(auth, provider);
-    setUser(result.user);
+    signInWithPopup(auth, provider);
   }
 
   return (
     <div className={styles.App}>
       <div className={styles.Title}>GMASH</div>
+      {user && <Members />}
       {!user && <img className={styles.GoogleSignIn} src={googleSignIn} onClick={signIn} />}
-      {user && <button className={styles.Button}>Start session</button>}
+      {user && <button className={styles.Button} onClick={(e) => signOut(getAuth())}>Register</button>}
     </div>
   );
 }

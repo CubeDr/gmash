@@ -5,10 +5,12 @@
   --theme-color-3: #75bfec;
   --theme-color-4: #6f9cde;
   --theme-color-5: #6879d0;
+  --theme-color-6: #6072b2;
 }
 
 body {
   background-color: var(--theme-color-1);
+  color: var(--theme-color-6);
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',

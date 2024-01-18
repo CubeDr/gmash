@@ -1,0 +1,13 @@
+.Members {
+    padding: 32px 14px 14px;
+}
+
+.TotalMembers {
+    display: block;
+    font-size: 12px;
+    text-align: end;
+}
+
+.MemberList li {
+    list-style-type: none;
+}
