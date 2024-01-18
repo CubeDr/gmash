@@ -37,7 +37,7 @@ export default function Members() {
             <ol className={styles.MemberList}>
                 {
                     members.map(member => (
-                        <li>{member.name} - {member.elo}</li>
+                        <li key={member.id}>{member.name} - {member.elo}</li>
                     ))
                 }
             </ol>
