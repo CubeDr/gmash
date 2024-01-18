@@ -54,7 +54,7 @@ function App() {
   return (
     <div className={styles.App}>
       <div className={styles.Title}>GMASH</div>
-      {showMembers() && <Members />}
+      {showMembers() && <div className={styles.MembersContainer}><Members /></div>}
       {showSignInButton() && <img className={styles.GoogleSignIn} src={googleSignIn} onClick={signIn} />}
       {showRegisterButton() && <button className={styles.Button} onClick={(e) => register()}>Register</button>}
       {showStartSessionButton() && <button className={styles.Button} onClick={(e) => {}}>Start Session</button>}
