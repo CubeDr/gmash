@@ -3,25 +3,29 @@ import Court from './court/Court';
 import styles from './SessionPage.module.css';
 import { useRef, useState } from 'react';
 import { Member } from '../../data/member';
+import MakeGameDialog from './makeGameDialog/MakeGameDialog';
+import MemberItem from './memberItem/MemberItem';
 
 export default function SessionPage() {
     const { members } = useSessionMembers();
-    const [selectedMemberIdsCount, setSelectedMemberIdsCount] = useState(0);
-    const selectedMembersRef = useRef(new Set<Member>());
+    const [selectedMembers, setSelectedMembers] = useState<Set<Member>>(new Set());
+    const [openMakeGameDialog, setOpenMakeGameDialog] = useState(false);
 
-    function onMemberClick(element: HTMLElement, member: Member) {
-        if (element.classList.contains(styles.SelectedMember)) {
-            element.classList.remove(styles.SelectedMember);
-            selectedMembersRef.current.delete(member);
-        } else if (selectedMembersRef.current.size < 4) {
-            element.classList.add(styles.SelectedMember);
-            selectedMembersRef.current.add(member);
+    function onMemberClick(member: Member) {
+        const newSet = new Set(selectedMembers);
+        if (selectedMembers.has(member)) {
+            newSet.delete(member);
+        } else if (selectedMembers.size < 4) {
+            newSet.add(member);
         }
-        setSelectedMemberIdsCount(selectedMembersRef.current.size);
+
+        if (newSet.size != selectedMembers.size) {
+            setSelectedMembers(newSet);
+        }
     }
 
     return (
-        <div className={selectedMemberIdsCount > 0 ? styles.PaddingBottom : ''}>
+        <div className={selectedMembers.size > 0 ? styles.PaddingBottom : ''}>
             <h4 className={styles.SectionTitle}>Now playing</h4>
             <Court team1={members.slice(0, 2)} team2={members.slice(2, 4)} />
             <h4 className={styles.SectionTitle}>Upcoming</h4>
@@ -30,21 +34,25 @@ export default function SessionPage() {
             <div className={styles.Members}>
                 {
                     members.map(member => (
-                        <div key={member.id} className={styles.Member} onClick={e => onMemberClick(e.target as HTMLElement, member)}>
-                            <div className={styles.MemberRow}>
-                                <span>{member.name}</span>
-                                <span>{member.elo}</span>
-                            </div>
-                            <span className={styles.GamesToday}>0 games played today</span>
-                        </div>
+                        <MemberItem key={member.id}
+                            member={member}
+                            isSelected={selectedMembers.has(member)}
+                            onClick={onMemberClick} />
                     ))
                 }
             </div>
-            {selectedMemberIdsCount > 0 &&
-                <button className={styles.Button}>
-                    Make a game ({selectedMemberIdsCount})
+            {selectedMembers.size > 0 &&
+                <button
+                    className={styles.Button}
+                    onClick={() => setOpenMakeGameDialog(true)}
+                    disabled={selectedMembers.size % 2 === 1}>
+                    Make a game ({selectedMembers.size})
                 </button>
             }
+            <MakeGameDialog
+                open={openMakeGameDialog}
+                onClose={() => setOpenMakeGameDialog(false)}
+                members={selectedMembers} />
         </div>
     );
 }

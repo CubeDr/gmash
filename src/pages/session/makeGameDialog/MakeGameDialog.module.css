@@ -1,0 +1,11 @@
+.Hint {
+    color: grey;
+    font-style: italic;
+    font-size: 12px;
+    margin-left: 14px;
+}
+
+.Versus {
+    display: block;
+    text-align: center;
+}

@@ -13,29 +13,6 @@
     padding: 8px 0;
 }
 
-.Member {
-    margin-bottom: 2px;
-    padding: 8px 14px;
-}
-
-.SelectedMember {
-    background-color: var(--theme-color-3);
-    color: var(--theme-color-0);
-}
-
-.MemberRow {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    pointer-events: none;
-}
-
-.GamesToday {
-    font-size: 12px;
-    margin-left: 8px;
-    pointer-events: none;
-}
-
 .Button {
     background-color: var(--theme-color-4);
     bottom: 0;
@@ -44,4 +21,10 @@
     padding: 18px;
     position: fixed;
     width: 100%;
+
+    transition: background-color 120ms;
+}
+
+.Button:disabled {
+    background-color: lightgrey;
 }
