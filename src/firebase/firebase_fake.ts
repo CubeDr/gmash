@@ -31,6 +31,7 @@ const user: User = {
 };
 
 let authStateChangeCallback: ((user: User | null) => void) | null = null;
+let sessionMemberIdsUpdateCallback: ((ids: string[]) => void) | null = null;
 
 const firebaseFake: Firebase = {
     signIn() {
@@ -46,6 +47,7 @@ const firebaseFake: Firebase = {
     },
 
     onAuthStateChanged(callback: (user: User | null) => void) {
+        callback(user);
         authStateChangeCallback = callback;
         return () => {
             authStateChangeCallback = null;
@@ -105,7 +107,24 @@ const firebaseFake: Firebase = {
                 role: 'member',
             };
         });
-    }
+    },
+
+    async updateSessionMemberIds(ids: string[]) {
+        localStorage.setItem('sessionMemberIds', JSON.stringify(ids));
+        if (sessionMemberIdsUpdateCallback) {
+            sessionMemberIdsUpdateCallback(ids);
+        }
+    },
+
+    listenToSessionMemberIds(listener: (ids: string[]) => void) {
+        sessionMemberIdsUpdateCallback = listener;
+        const ids = JSON.parse(localStorage.getItem('sessionMemberIds') ?? '[]') as string[];
+        listener(ids);
+
+        return () => {
+            sessionMemberIdsUpdateCallback = null;
+        };
+    },
 };
 
 export default firebaseFake;

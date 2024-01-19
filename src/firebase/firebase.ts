@@ -10,4 +10,7 @@ export default interface Firebase {
     getGoogler: (user: User) => Promise<Googler>;
     getAllMembers: () => Promise<Member[]>;
     getMembersById: (ids: string[]) => Promise<Member[]>;
+    
+    updateSessionMemberIds: (ids: string[]) => Promise<void>;
+    listenToSessionMemberIds: (listener: (ids: string[]) => void) => Unsubscribe;
 }

@@ -10,7 +10,7 @@ export default function HomePage() {
   const { googler, refetch } = useContext(GooglerContext);
   const [isSelectingMember, setIsSelectingMember] = useState(false);
   const [selectedMembersCount, setSelectedMembersCount] = useState(0);
-  const selectedMemberIds = useRef(new Set<String>());
+  const selectedMemberIds = useRef(new Set<string>());
   const navigate = useNavigate();
 
   function showMembers() {
@@ -51,14 +51,14 @@ export default function HomePage() {
     setIsSelectingMember(true);
   }
 
-  function onSelectedMemberIdsChange(newSelectedMemberIds: Set<String>) {
+  function onSelectedMemberIdsChange(newSelectedMemberIds: Set<string>) {
     selectedMemberIds.current = newSelectedMemberIds;
     setSelectedMembersCount(newSelectedMemberIds.size);
   }
 
   function proceed() {
-    navigate('/session', {
-        state: selectedMemberIds.current,
+    firebase.updateSessionMemberIds(Array.from(selectedMemberIds.current)).then(() => {
+      navigate('/session');
     });
   }
 

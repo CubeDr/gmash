@@ -2,6 +2,7 @@ import { QuerySnapshot, collection, doc, documentId, getDoc, getDocs, getFiresto
 import { getAuth, signInWithPopup, GoogleAuthProvider, User, onAuthStateChanged, signOut } from 'firebase/auth';
 import Firebase from './firebase';
 import { Member } from '../data/member';
+import { getDatabase, onValue, ref, set } from 'firebase/database';
 
 function snapshotToMembers(snapshot: QuerySnapshot) {
     const members: Member[] = [];
@@ -62,7 +63,17 @@ const firebaseImpl: Firebase = {
         const snapshot = await getDocs(query(collection(getFirestore(), 'googlers'),
             where(documentId(), 'in', ids)));
         return snapshotToMembers(snapshot);
-    }
+    },
+
+    updateSessionMemberIds(ids: string[]) {
+        return set(ref(getDatabase(), 'members'), ids);
+    },
+
+    listenToSessionMemberIds(listener: (ids: string[]) => void) {
+        return onValue(ref(getDatabase(), 'members'), (snapshot) => {
+            listener(snapshot.val());
+        });
+    },
 };
 
 export default firebaseImpl;

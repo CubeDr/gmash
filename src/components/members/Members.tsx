@@ -4,12 +4,12 @@ import { MembersContext } from '../../providers/MembersContext';
 
 interface MembersProps {
     mode: 'view' | 'select';
-    onSelectedMemberIdsChange?: (selectedMemberIds: Set<String>) => void;
+    onSelectedMemberIdsChange?: (selectedMemberIds: Set<string>) => void;
 }
 
 export default function Members({ mode, onSelectedMemberIdsChange }: MembersProps) {
     const { members } = useContext(MembersContext);
-    const selectedMemberIds = useRef(new Set<String>());
+    const selectedMemberIds = useRef(new Set<string>());
 
     return (
         <div className={styles.Members}>

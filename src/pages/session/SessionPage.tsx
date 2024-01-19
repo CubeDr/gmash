@@ -1,17 +1,17 @@
-import { useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import useSelectedMembers from './useSelectedMembers';
+import Court from './court/Court';
 
 export default function SessionPage() {
-    const location = useLocation();
-    const [selectedMemberIds, setSelectedMemberIds] = useState<Set<string>>(location.state);
-    const { members } = useSelectedMembers({selectedMemberIds});
+    const { members } = useSelectedMembers();
 
     useEffect(() => {
         console.log(members);
     }, [members]);
 
     return (
-        <div>Session Page</div>
+        <div>
+            <Court team1={[members[0], members[1]]} team2={[members[2], members[3]]} />
+        </div>
     );
 }
