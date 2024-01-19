@@ -4,7 +4,6 @@ import firebase from '../firebase';
 import { GooglerContext } from './GooglerContext';
 
 interface MembersContextProviderProps {
-    selectedMemberIds?: Set<string>;
     children: ReactNode;
 }
 
@@ -16,7 +15,7 @@ export const MembersContext = createContext({
     members: []
 } as MembersContextTypes);
 
-export function MembersContextProvider({ selectedMemberIds, children }: MembersContextProviderProps) {
+export function MembersContextProvider({ children }: MembersContextProviderProps) {
     const { googler } = useContext(GooglerContext);
     const [members, setMembers] = useState<Member[]>([]);
 
@@ -26,16 +25,10 @@ export function MembersContextProvider({ selectedMemberIds, children }: MembersC
             return;
         }
 
-        if (selectedMemberIds == null) {
-            firebase.getAllMembers().then(members => {
-                setMembers(members);
-            });
-        } else {
-            firebase.getMembersById(Array.from(selectedMemberIds)).then(members => {
-                setMembers(members);
-            });
-        }
-    }, [googler, selectedMemberIds]);
+        firebase.getAllMembers().then(members => {
+            setMembers(members);
+        });
+    }, [googler]);
 
     return (
         <MembersContext.Provider value={{ members }}>

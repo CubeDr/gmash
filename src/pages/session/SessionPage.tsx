@@ -1,10 +1,11 @@
 import { useLocation } from 'react-router-dom';
-import { useContext, useEffect } from 'react';
-import { MembersContext } from '../../providers/MembersContext';
+import { useEffect, useState } from 'react';
+import useSelectedMembers from './useSelectedMembers';
 
 export default function SessionPage() {
     const location = useLocation();
-    const members = useContext(MembersContext);
+    const [selectedMemberIds, setSelectedMemberIds] = useState<Set<string>>(location.state);
+    const { members } = useSelectedMembers({selectedMemberIds});
 
     useEffect(() => {
         console.log(members);
