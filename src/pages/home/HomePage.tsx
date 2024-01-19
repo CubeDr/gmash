@@ -1,14 +1,13 @@
 import styles from './HomePage.module.css';
-import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import googleSignIn from './google_signin.png';
-import useGoogler from '../../useGoogler';
 import Members from '../../components/members/Members';
-import { doc, getFirestore, setDoc } from 'firebase/firestore';
-import { useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import firebase from '../../firebase';
+import { GooglerContext } from '../../providers/GooglerContext';
 
 export default function HomePage() {
-  const { googler, refetch } = useGoogler();
+  const { googler, refetch } = useContext(GooglerContext);
   const [isSelectingMember, setIsSelectingMember] = useState(false);
   const [selectedMembersCount, setSelectedMembersCount] = useState(0);
   const selectedMemberIds = useRef(new Set<String>());
@@ -35,16 +34,7 @@ export default function HomePage() {
   }
 
   function signIn() {
-    const auth = getAuth();
-    if (auth.currentUser != null) {
-      return;
-    }
-
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({
-      prompt: 'select_account'
-    });
-    signInWithPopup(auth, provider);
+    firebase.signIn();
   }
 
   function register() {
@@ -52,11 +42,7 @@ export default function HomePage() {
       return;
     }
 
-    setDoc(doc(getFirestore(), 'googlers', googler.user.uid), {
-      name: googler.user.displayName,
-      elo: 1000,
-      role: 'member',
-    }).then(() => {
+    firebase.register(googler.user.uid, googler.user.displayName!).then(() => {
       refetch();
     });
   }

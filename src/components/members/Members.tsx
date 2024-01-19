@@ -1,7 +1,6 @@
-import { useRef } from 'react';
+import { useContext, useRef } from 'react';
 import styles from './Members.module.css';
-import useMembers from '../../useMembers';
-import { Member } from '../../data/member';
+import { MembersContext } from '../../providers/MembersContext';
 
 interface MembersProps {
     mode: 'view' | 'select';
@@ -9,8 +8,7 @@ interface MembersProps {
 }
 
 export default function Members({ mode, onSelectedMemberIdsChange }: MembersProps) {
-    const members = useMembers();
-    // const members: Member[] = [];
+    const { members } = useContext(MembersContext);
     const selectedMemberIds = useRef(new Set<String>());
 
     return (
@@ -27,7 +25,7 @@ export default function Members({ mode, onSelectedMemberIdsChange }: MembersProp
                                     } else {
                                         selectedMemberIds.current.delete(member.id);
                                     }
-                                    
+
                                     if (onSelectedMemberIdsChange) {
                                         onSelectedMemberIdsChange(selectedMemberIds.current);
                                     }
