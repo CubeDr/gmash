@@ -20,7 +20,7 @@ export default function SessionPage() {
       newSet.add(member);
     }
 
-    if (newSet.size != selectedMembers.size) {
+    if (newSet.size !== selectedMembers.size) {
       setSelectedMembers(newSet);
     }
   }

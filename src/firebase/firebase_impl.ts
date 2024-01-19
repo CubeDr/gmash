@@ -65,8 +65,14 @@ const firebaseImpl: Firebase = {
         return snapshotToMembers(snapshot);
     },
 
-    updateSessionMemberIds(ids: string[]) {
-        return set(ref(getDatabase(), 'members'), ids);
+    async updateSessionMemberIds(ids: string[]) {
+        console.log(ids);
+        try {
+            await set(ref(getDatabase(), 'members'), ids);
+        } catch(e) {
+            console.error(e);
+        }
+        console.log('done');
     },
 
     listenToSessionMemberIds(listener: (ids: string[]) => void) {

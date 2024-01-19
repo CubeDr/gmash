@@ -12,7 +12,8 @@ const firebaseConfig = {
   storageBucket: "gmash-496a9.appspot.com",
   messagingSenderId: "131659335029",
   appId: "1:131659335029:web:d675ce7e9cbe1dba753f3c",
-  measurementId: "G-X17ZEEE5DZ"
+  measurementId: "G-X17ZEEE5DZ",
+  databaseURL: "https://gmash-496a9-default-rtdb.asia-southeast1.firebasedatabase.app",
 };
 
 // Initialize Firebase
