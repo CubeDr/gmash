@@ -1,3 +1,7 @@
+.PaddingBottom {
+    padding-bottom: 51px;
+}
+
 .SectionTitle {
     margin-left: 18px;
 }
@@ -6,20 +10,38 @@
     background-color: var(--theme-color-0);
     border-radius: 8px;
     margin: 8px;
-    padding: 14px;
+    padding: 8px 0;
 }
 
 .Member {
-    margin-bottom: 18px;
+    margin-bottom: 2px;
+    padding: 8px 14px;
+}
+
+.SelectedMember {
+    background-color: var(--theme-color-3);
+    color: var(--theme-color-0);
 }
 
 .MemberRow {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    pointer-events: none;
 }
 
 .GamesToday {
     font-size: 12px;
     margin-left: 8px;
+    pointer-events: none;
+}
+
+.Button {
+    background-color: var(--theme-color-4);
+    bottom: 0;
+    border: none;
+    color: var(--theme-color-0);
+    padding: 18px;
+    position: fixed;
+    width: 100%;
 }
