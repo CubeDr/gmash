@@ -5,16 +5,16 @@ import firebase from '../../firebase';
 
 export default function useSelectedMembers() {
     const { members } = useContext(MembersContext);
-    const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
+    const [sessionMembers, setSessionMembers] = useState<Member[]>([]);
 
     useEffect(() => {
         const unsubscribe = firebase.listenToSessionMemberIds(ids => {
             const idSet = new Set(ids);
             const selected = members.filter(member => idSet.has(member.id));
-            setSelectedMembers(selected);
+            setSessionMembers(selected);
         });
         return () => unsubscribe();
     }, [members]);
 
-    return { members: selectedMembers };
+    return { members: sessionMembers };
 }

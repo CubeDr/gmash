@@ -1,9 +1,9 @@
-import useSelectedMembers from './useSelectedMembers';
+import useSessionMembers from './useSessionMembers';
 import Court from './court/Court';
 import styles from './SessionPage.module.css';
 
 export default function SessionPage() {
-    const { members } = useSelectedMembers();
+    const { members } = useSessionMembers();
 
     return (
         <div>
