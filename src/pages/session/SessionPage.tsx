@@ -51,7 +51,12 @@ export default function SessionPage() {
       }
       <MakeGameDialog
         open={openMakeGameDialog}
-        onClose={() => setOpenMakeGameDialog(false)}
+        onClose={(success) => {
+          if (success) {
+            setSelectedMembers(new Set());
+          }
+          setOpenMakeGameDialog(false);
+        }}
         members={selectedMembers}/>
     </div>
   );

@@ -1,4 +1,4 @@
-import { User } from 'firebase/auth';
+import {Unsubscribe, User} from 'firebase/auth';
 import Firebase from './firebase';
 import { Member } from '../data/member';
 
@@ -32,6 +32,7 @@ const user: User = {
 
 let authStateChangeCallback: ((user: User | null) => void) | null = null;
 let sessionMemberIdsUpdateCallback: ((ids: string[]) => void) | null = null;
+let upcomingGamesUpdateCallback: ((games: {team1: string[], team2: string[]}[]) => void) | null = null;
 
 const firebaseFake: Firebase = {
     signIn() {
@@ -125,6 +126,25 @@ const firebaseFake: Firebase = {
             sessionMemberIdsUpdateCallback = null;
         };
     },
+
+    async addUpcomingGame(team1: string[], team2: string[]) {
+        const upcomingGames = JSON.parse(localStorage.getItem('upcoming') ?? '[]');
+        upcomingGames.push({team1, team2});
+        localStorage.setItem('upcoming', JSON.stringify(upcomingGames));
+
+        if (upcomingGamesUpdateCallback) {
+            upcomingGamesUpdateCallback(upcomingGames);
+        }
+    },
+
+    listenToUpcomingGames(listener: (games: {team1: string[], team2: string[]}[]) => void) {
+        upcomingGamesUpdateCallback = listener;
+        listener(JSON.parse(localStorage.getItem('upcoming') ?? '[]'));
+
+        return () => {
+            upcomingGamesUpdateCallback = null;
+        };
+    }
 };
 
 export default firebaseFake;

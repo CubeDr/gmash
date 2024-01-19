@@ -3,10 +3,11 @@ import {Member} from '../../../data/member';
 import {useEffect, useState} from 'react';
 import MemberItem from '../memberItem/MemberItem';
 import styles from './MakeGameDialog.module.css';
+import firebase from "../../../firebase";
 
 interface MakeGameDialogProps {
   open: boolean;
-  onClose: () => void;
+  onClose: (success?: boolean) => void;
   members: Set<Member>;
 }
 
@@ -17,7 +18,7 @@ function replace(team: Member[], before: Member, after: Member) {
   return newTeam;
 }
 
-export default function MakeGameDialog({open, onClose: onCancel, members}: MakeGameDialogProps) {
+export default function MakeGameDialog({open, onClose, members}: MakeGameDialogProps) {
   const [team1, setTeam1] = useState<Member[]>([]);
   const [team2, setTeam2] = useState<Member[]>([]);
 
@@ -45,10 +46,15 @@ export default function MakeGameDialog({open, onClose: onCancel, members}: MakeG
     setTeam2SelectedMember(null);
   }, [team1SelectedMember, team2SelectedMember]);
 
+  function onConfirm() {
+    firebase.addUpcomingGame(team1.map(member => member.id), team2.map(member => member.id))
+      .then(() => onClose(true));
+  }
+
   return (
     <Dialog open={open} onClose={(_, reason) => {
       if (reason === 'backdropClick') return;
-      onCancel();
+      onClose();
     }}>
       <DialogTitle>Make a new game</DialogTitle>
       <span className={styles.Hint}>Tap two players to switch team</span>
@@ -82,8 +88,8 @@ export default function MakeGameDialog({open, onClose: onCancel, members}: MakeG
             }}/>))
       }
       <DialogActions>
-        <Button onClick={() => onCancel()}>Cancel</Button>
-        <Button>Confirm</Button>
+        <Button onClick={() => onClose()}>Cancel</Button>
+        <Button onClick={() => onConfirm()}>Confirm</Button>
       </DialogActions>
     </Dialog>
   );

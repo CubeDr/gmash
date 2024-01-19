@@ -2,7 +2,7 @@ import { QuerySnapshot, collection, doc, documentId, getDoc, getDocs, getFiresto
 import { getAuth, signInWithPopup, GoogleAuthProvider, User, onAuthStateChanged, signOut } from 'firebase/auth';
 import Firebase from './firebase';
 import { Member } from '../data/member';
-import { getDatabase, onValue, ref, set } from 'firebase/database';
+import { getDatabase, onValue, ref, set, push } from 'firebase/database';
 
 function snapshotToMembers(snapshot: QuerySnapshot) {
     const members: Member[] = [];
@@ -74,6 +74,20 @@ const firebaseImpl: Firebase = {
             listener(snapshot.val());
         });
     },
+
+    addUpcomingGame(team1: string[], team2: string[]) {
+        return set(push(ref(getDatabase(), 'upcoming')), {team1, team2});
+    },
+
+    listenToUpcomingGames(listener: (games: {team1: string[], team2: string[]}[]) => void) {
+        return onValue(ref(getDatabase(), 'upcoming'), snapshot => {
+            const upcomingGames: {team1: string[], team2: string[]}[] = [];
+            snapshot.forEach(gameSnapshot => {
+                upcomingGames.push(gameSnapshot.val());
+            });
+            listener(upcomingGames);
+        });
+    }
 };
 
 export default firebaseImpl;
