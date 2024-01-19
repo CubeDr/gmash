@@ -7,17 +7,17 @@ import { Member } from '../../data/member';
 export default function SessionPage() {
     const { members } = useSessionMembers();
     const [selectedMemberIdsCount, setSelectedMemberIdsCount] = useState(0);
-    const selectedMemberIdsRef = useRef(new Set<String>());
+    const selectedMembersRef = useRef(new Set<Member>());
 
     function onMemberClick(element: HTMLElement, member: Member) {
         if (element.classList.contains(styles.SelectedMember)) {
             element.classList.remove(styles.SelectedMember);
-            selectedMemberIdsRef.current.delete(member.id);
-        } else if (selectedMemberIdsRef.current.size < 4) {
+            selectedMembersRef.current.delete(member);
+        } else if (selectedMembersRef.current.size < 4) {
             element.classList.add(styles.SelectedMember);
-            selectedMemberIdsRef.current.add(member.id);
+            selectedMembersRef.current.add(member);
         }
-        setSelectedMemberIdsCount(selectedMemberIdsRef.current.size);
+        setSelectedMemberIdsCount(selectedMembersRef.current.size);
     }
 
     return (
