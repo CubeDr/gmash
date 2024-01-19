@@ -1,6 +1,6 @@
-import {Unsubscribe, User} from 'firebase/auth';
+import {User} from 'firebase/auth';
 import Firebase from './firebase';
-import { Member } from '../data/member';
+import {Member} from '../data/member';
 
 const user: User = {
     emailVerified: true,
@@ -10,8 +10,8 @@ const user: User = {
     refreshToken: '',
     tenantId: null,
     delete: async () => { },
-    getIdToken: async (forceRefresh) => '',
-    getIdTokenResult: async (forceRefresh) => ({
+    getIdToken: async () => '',
+    getIdTokenResult: async () => ({
         authTime: '',
         expirationTime: '',
         issuedAtTime: '',
@@ -55,7 +55,7 @@ const firebaseFake: Firebase = {
         };
     },
 
-    async register(id: string, name: string) { /* no-op */ },
+    async register() { /* no-op */ },
 
     async getGoogler(user: User) {
         await new Promise(resolve => {
