@@ -5,6 +5,7 @@ import {useState} from 'react';
 import {Member} from '../../data/member';
 import MakeGameDialog from './makeGameDialog/MakeGameDialog';
 import MemberItem from './memberItem/MemberItem';
+import UpcomingGames from "./upcomingGames/UpcomingGames";
 
 export default function SessionPage() {
   const {members} = useSessionMembers();
@@ -29,7 +30,7 @@ export default function SessionPage() {
       <h4 className={styles.SectionTitle}>Now playing</h4>
       <Court team1={members.slice(0, 2)} team2={members.slice(2, 4)}/>
       <h4 className={styles.SectionTitle}>Upcoming</h4>
-      <Court team1={members.slice(0, 2)} team2={members.slice(2, 4)}/>
+      <UpcomingGames/>
       <h4 className={styles.SectionTitle}>Members</h4>
       <div className={styles.Members}>
         {

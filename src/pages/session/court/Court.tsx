@@ -9,12 +9,14 @@ interface CourtProps {
 export default function Court({team1, team2}: CourtProps) {
   return (
     <div className={styles.Court}>
-      <div className={styles.Team}>
-        {team1.map(member => (<span key={member.id} className={styles.Player}>{member.name}</span>))}
-      </div>
-      <hr className={styles.Divider}/>
-      <div className={styles.Team}>
-        {team2.map(member => (<span key={member.id} className={styles.Player}>{member.name}</span>))}
+      <div className={styles.CourtContent}>
+        <div className={styles.Team}>
+          {team1.map(member => (<span key={member.id} className={styles.Player}>{member.name}</span>))}
+        </div>
+        <hr className={styles.Divider}/>
+        <div className={styles.Team}>
+          {team2.map(member => (<span key={member.id} className={styles.Player}>{member.name}</span>))}
+        </div>
       </div>
     </div>
   );
