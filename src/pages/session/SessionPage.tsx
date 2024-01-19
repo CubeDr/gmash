@@ -11,7 +11,7 @@ export default function SessionPage() {
 
     return (
         <div>
-            <Court team1={[members[0], members[1]]} team2={[members[2], members[3]]} />
+            <Court team1={members.slice(0, 2)} team2={members.slice(2, 4)} />
         </div>
     );
 }

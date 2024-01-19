@@ -1,3 +1,23 @@
 .Court {
-    
+    background-color: var(--theme-color-0);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    height: 120px;
+    margin: 4px;
+    padding: 4px;
+    width: 120px;
+}
+
+.Team {
+    flex-grow: 1;
+}
+
+.Divider {
+    width: 80%;
+}
+
+.Player {
+    display: block;
+    text-align: center;
 }
