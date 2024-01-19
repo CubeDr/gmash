@@ -30,7 +30,7 @@ export default function SessionPage() {
             <div className={styles.Members}>
                 {
                     members.map(member => (
-                        <div className={styles.Member} onClick={e => onMemberClick(e.target as HTMLElement, member)}>
+                        <div key={member.id} className={styles.Member} onClick={e => onMemberClick(e.target as HTMLElement, member)}>
                             <div className={styles.MemberRow}>
                                 <span>{member.name}</span>
                                 <span>{member.elo}</span>
