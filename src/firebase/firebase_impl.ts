@@ -96,6 +96,10 @@ const firebaseImpl: Firebase = {
             });
             listener(upcomingGames);
         });
+    },
+
+    update(ref, value) {
+        return set(ref, value);
     }
 };
 

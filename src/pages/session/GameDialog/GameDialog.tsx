@@ -55,7 +55,10 @@ export default function GameDialog({title, open, onClose, game: initialGame, act
       firebase.addUpcomingGame(game.team1.map(member => member.id), game.team2.map(member => member.id))
         .then(() => onClose(true));
     } else {
-      // Update game
+      firebase.update(game.ref, {
+        team1: game.team1.map(member => member.id),
+        team2: game.team2.map(member => member.id),
+      }).then(() => onClose(true));
     }
   }
 
