@@ -2,13 +2,14 @@ import {Button, Dialog, DialogActions, DialogTitle} from '@mui/material'
 import {Member} from '../../../data/member';
 import {useEffect, useState} from 'react';
 import MemberItem from '../memberItem/MemberItem';
-import styles from './MakeGameDialog.module.css';
+import styles from './GameDialog.module.css';
 import firebase from "../../../firebase";
+import Game from '../../../data/game';
 
-interface MakeGameDialogProps {
+interface GameDialogProps {
   open: boolean;
   onClose: (success?: boolean) => void;
-  members: Set<Member>;
+  game: Game;
 }
 
 function replace(team: Member[], before: Member, after: Member) {
@@ -18,36 +19,32 @@ function replace(team: Member[], before: Member, after: Member) {
   return newTeam;
 }
 
-export default function MakeGameDialog({open, onClose, members}: MakeGameDialogProps) {
-  const [team1, setTeam1] = useState<Member[]>([]);
-  const [team2, setTeam2] = useState<Member[]>([]);
-
+export default function GameDialog({open, onClose, game: initialGame}: GameDialogProps) {
+  const [game, setGame] = useState(initialGame);
   const [team1SelectedMember, setTeam1SelectedMember] = useState<Member | null>(null);
   const [team2SelectedMember, setTeam2SelectedMember] = useState<Member | null>(null);
 
   useEffect(() => {
-    const sorted = Array.from(members).sort((a, b) => b.elo - a.elo);
-
-    const newTeam1: Member[] = [...sorted.slice(0, 1), ...sorted.slice(3)];
-    const newTeam2: Member[] = sorted.slice(1, 3);
-
-    setTeam1(newTeam1);
-    setTeam2(newTeam2);
-  }, [members]);
+    setGame(initialGame);
+  }, [initialGame]);
 
   useEffect(() => {
     if (team1SelectedMember == null || team2SelectedMember == null) {
       return;
     }
 
-    setTeam1(team1 => replace(team1, team1SelectedMember, team2SelectedMember));
-    setTeam2(team2 => replace(team2, team2SelectedMember, team1SelectedMember));
+    setGame(game => ({
+      ref: game.ref,
+      team1: replace(game.team1, team1SelectedMember, team2SelectedMember),
+      team2: replace(game.team2, team2SelectedMember, team1SelectedMember),
+    }));
+
     setTeam1SelectedMember(null);
     setTeam2SelectedMember(null);
   }, [team1SelectedMember, team2SelectedMember]);
 
   function onConfirm() {
-    firebase.addUpcomingGame(team1.map(member => member.id), team2.map(member => member.id))
+    firebase.addUpcomingGame(game.team1.map(member => member.id), game.team2.map(member => member.id))
       .then(() => onClose(true));
   }
 
@@ -59,7 +56,7 @@ export default function MakeGameDialog({open, onClose, members}: MakeGameDialogP
       <DialogTitle>Make a new game</DialogTitle>
       <span className={styles.Hint}>Tap two players to switch team</span>
       {
-        team1.map(member => (
+        game.team1.map(member => (
           <MemberItem
             key={member.id}
             member={member}
@@ -74,7 +71,7 @@ export default function MakeGameDialog({open, onClose, members}: MakeGameDialogP
       }
       <span className={styles.Versus}>vs</span>
       {
-        team2.map(member => (
+        game.team2.map(member => (
           <MemberItem
             key={member.id}
             member={member}

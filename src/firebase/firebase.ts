@@ -1,6 +1,7 @@
 import { Unsubscribe, User } from 'firebase/auth';
 import { Googler } from '../data/googler';
 import { Member } from '../data/member';
+import { DatabaseReference } from 'firebase/database';
 
 export default interface Firebase {
     signIn: () => void;
@@ -15,5 +16,5 @@ export default interface Firebase {
     listenToSessionMemberIds: (listener: (ids: string[]) => void) => Unsubscribe;
 
     addUpcomingGame: (team1: string[], team2: string[]) => Promise<void>;
-    listenToUpcomingGames: (listener: (games: {team1: string[], team2: string[]}[]) => void) => Unsubscribe;
+    listenToUpcomingGames: (listener: (games: {team1: string[], team2: string[], ref: DatabaseReference}[]) => void) => Unsubscribe;
 }

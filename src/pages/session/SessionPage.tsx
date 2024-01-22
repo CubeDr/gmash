@@ -3,7 +3,7 @@ import Court from './court/Court';
 import styles from './SessionPage.module.css';
 import {useState} from 'react';
 import {Member} from '../../data/member';
-import MakeGameDialog from './makeGameDialog/MakeGameDialog';
+import GameDialog from './GameDialog/GameDialog';
 import MemberItem from './memberItem/MemberItem';
 import UpcomingGames from "./upcomingGames/UpcomingGames";
 
@@ -11,6 +11,15 @@ export default function SessionPage() {
   const {members} = useSessionMembers();
   const [selectedMembers, setSelectedMembers] = useState<Set<Member>>(new Set());
   const [openMakeGameDialog, setOpenMakeGameDialog] = useState(false);
+
+  function makeGameFromSelectedMembers() {
+    const sorted = Array.from(selectedMembers).sort((a, b) => b.elo - a.elo);
+
+    return {
+        team1: [...sorted.slice(0, 1), ...sorted.slice(3)],
+        team2: sorted.slice(1, 3),
+    };
+  }
 
   function onMemberClick(member: Member) {
     const newSet = new Set(selectedMembers);
@@ -28,7 +37,10 @@ export default function SessionPage() {
   return (
     <div className={selectedMembers.size > 0 ? styles.PaddingBottom : ''}>
       <h4 className={styles.SectionTitle}>Now playing</h4>
-      <Court team1={members.slice(0, 2)} team2={members.slice(2, 4)}/>
+      <Court game={{
+        team1: members.slice(0, 2),
+        team2: members.slice(2, 4),
+      }}/>
       <h4 className={styles.SectionTitle}>Upcoming</h4>
       <UpcomingGames/>
       <h4 className={styles.SectionTitle}>Members</h4>
@@ -50,7 +62,7 @@ export default function SessionPage() {
           Make a game ({selectedMembers.size})
         </button>
       }
-      <MakeGameDialog
+      <GameDialog
         open={openMakeGameDialog}
         onClose={(success) => {
           if (success) {
@@ -58,7 +70,7 @@ export default function SessionPage() {
           }
           setOpenMakeGameDialog(false);
         }}
-        members={selectedMembers}/>
+        game={makeGameFromSelectedMembers()}/>
     </div>
   );
 }
