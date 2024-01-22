@@ -4,14 +4,19 @@ import {MembersContext} from '../../../providers/MembersContext';
 import Court from '../court/Court';
 import styles from './UpcomingGames.module.css';
 import Game from '../../../data/game';
+import GameDialog from '../GameDialog/GameDialog';
 
 export default function UpcomingGames() {
   const {members} = useContext(MembersContext);
   const [games, setGames] = useState<Game[]>([]);
 
+  const [selectedGame, setSelectedGame] = useState<Game | null>(null);
+
   function getMemberById(id: string) {
     return members.find(member => member.id === id)!;
   }
+
+  function playGame(game: Game) {}
 
   useEffect(() => {
     const unsubscribe = firebase.listenToUpcomingGames(upcomingGames => {
@@ -29,9 +34,22 @@ export default function UpcomingGames() {
 
   return (
     <div className={styles.UpcomingGames}>
-      {games.map(game => (
-        <Court game={game}/>
+      {games.map((game, i) => (
+        <Court key={'upcoming-' + i} game={game} onClick={() => setSelectedGame(game)}/>
       ))}
+      {selectedGame &&
+        <GameDialog
+          title='Update an upcoming game'
+          game={selectedGame}
+          onClose={() => setSelectedGame(null)}
+          open={selectedGame != null}
+          actions={[
+            {
+              text: 'Play',
+              action: playGame,
+            }
+          ]}/>
+      }
     </div>
   );
 }

@@ -6,10 +6,17 @@ import styles from './GameDialog.module.css';
 import firebase from "../../../firebase";
 import Game from '../../../data/game';
 
+interface GameDialogAction {
+  text: string;
+  action: (game: Game) => void;
+}
+
 interface GameDialogProps {
+  title: string;
   open: boolean;
   onClose: (success?: boolean) => void;
   game: Game;
+  actions?: GameDialogAction[],
 }
 
 function replace(team: Member[], before: Member, after: Member) {
@@ -19,7 +26,7 @@ function replace(team: Member[], before: Member, after: Member) {
   return newTeam;
 }
 
-export default function GameDialog({open, onClose, game: initialGame}: GameDialogProps) {
+export default function GameDialog({title, open, onClose, game: initialGame, actions}: GameDialogProps) {
   const [game, setGame] = useState(initialGame);
   const [team1SelectedMember, setTeam1SelectedMember] = useState<Member | null>(null);
   const [team2SelectedMember, setTeam2SelectedMember] = useState<Member | null>(null);
@@ -44,8 +51,12 @@ export default function GameDialog({open, onClose, game: initialGame}: GameDialo
   }, [team1SelectedMember, team2SelectedMember]);
 
   function onConfirm() {
-    firebase.addUpcomingGame(game.team1.map(member => member.id), game.team2.map(member => member.id))
-      .then(() => onClose(true));
+    if (game.ref == null) {
+      firebase.addUpcomingGame(game.team1.map(member => member.id), game.team2.map(member => member.id))
+        .then(() => onClose(true));
+    } else {
+      // Update game
+    }
   }
 
   return (
@@ -53,7 +64,7 @@ export default function GameDialog({open, onClose, game: initialGame}: GameDialo
       if (reason === 'backdropClick') return;
       onClose();
     }}>
-      <DialogTitle>Make a new game</DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <span className={styles.Hint}>Tap two players to switch team</span>
       {
         game.team1.map(member => (
@@ -86,7 +97,12 @@ export default function GameDialog({open, onClose, game: initialGame}: GameDialo
       }
       <DialogActions>
         <Button onClick={() => onClose()}>Cancel</Button>
-        <Button onClick={() => onConfirm()}>Confirm</Button>
+        <Button onClick={() => onConfirm()}>{game.ref ? 'Update' : 'Create'}</Button>
+        {
+          actions?.map(action => (
+            <Button onClick={() => action.action(game)}>{action.text}</Button>
+          ))
+        }
       </DialogActions>
     </Dialog>
   );

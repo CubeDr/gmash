@@ -63,6 +63,7 @@ export default function SessionPage() {
         </button>
       }
       <GameDialog
+        title='Make a new game'
         open={openMakeGameDialog}
         onClose={(success) => {
           if (success) {
