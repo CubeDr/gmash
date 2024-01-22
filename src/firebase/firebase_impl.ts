@@ -2,7 +2,7 @@ import { QuerySnapshot, collection, doc, documentId, getDoc, getDocs, getFiresto
 import { getAuth, signInWithPopup, GoogleAuthProvider, User, onAuthStateChanged, signOut } from 'firebase/auth';
 import Firebase from './firebase';
 import { Member } from '../data/member';
-import { getDatabase, onValue, ref, set, push, DatabaseReference } from 'firebase/database';
+import { getDatabase, onValue, ref, set, push, DatabaseReference, remove } from 'firebase/database';
 
 function snapshotToMembers(snapshot: QuerySnapshot) {
     const members: Member[] = [];
@@ -98,8 +98,16 @@ const firebaseImpl: Firebase = {
         });
     },
 
+    addPlayingGame(team1: string[], team2: string[]) {
+        return set(push(ref(getDatabase(), 'playing')), {team1, team2});
+    },
+
     update(ref, value) {
         return set(ref, value);
+    },
+
+    delete(ref) {
+        return remove(ref);
     }
 };
 

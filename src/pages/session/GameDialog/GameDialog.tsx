@@ -8,7 +8,7 @@ import Game from '../../../data/game';
 
 interface GameDialogAction {
   text: string;
-  action: (game: Game) => void;
+  action: (game: Game) => Promise<void>;
 }
 
 interface GameDialogProps {
@@ -103,7 +103,10 @@ export default function GameDialog({title, open, onClose, game: initialGame, act
         <Button onClick={() => onConfirm()}>{game.ref ? 'Update' : 'Create'}</Button>
         {
           actions?.map(action => (
-            <Button onClick={() => action.action(game)}>{action.text}</Button>
+            <Button onClick={async () => {
+              await action.action(game);
+              onClose(true);
+            }}>{action.text}</Button>
           ))
         }
       </DialogActions>

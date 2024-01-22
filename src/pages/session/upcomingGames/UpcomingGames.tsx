@@ -16,7 +16,12 @@ export default function UpcomingGames() {
     return members.find(member => member.id === id)!;
   }
 
-  function playGame(game: Game) {}
+  async function playGame(game: Game) {
+    if (game.ref == null) throw new Error('Game is not registered correctly.');
+
+    await firebase.delete(game.ref);
+    await firebase.addPlayingGame(game.team1.map(member => member.id), game.team2.map(member => member.id));
+  }
 
   useEffect(() => {
     const unsubscribe = firebase.listenToUpcomingGames(upcomingGames => {
