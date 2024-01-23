@@ -31,6 +31,9 @@ export default function GameDialog({title, open, onClose, game: initialGame, act
   const [team1SelectedMember, setTeam1SelectedMember] = useState<Member | null>(null);
   const [team2SelectedMember, setTeam2SelectedMember] = useState<Member | null>(null);
 
+  // Initially set to updated when the game is newly creating.
+  const [isUpdated, setIsUpdated] = useState(game.ref == null);
+
   useEffect(() => {
     setGame(initialGame);
   }, [initialGame]);
@@ -48,6 +51,7 @@ export default function GameDialog({title, open, onClose, game: initialGame, act
 
     setTeam1SelectedMember(null);
     setTeam2SelectedMember(null);
+    setIsUpdated(true);
   }, [team1SelectedMember, team2SelectedMember]);
 
   function onConfirm() {
@@ -100,9 +104,11 @@ export default function GameDialog({title, open, onClose, game: initialGame, act
       }
       <DialogActions>
         <Button onClick={() => onClose()}>Cancel</Button>
-        <Button onClick={() => onConfirm()}>{game.ref ? 'Update' : 'Create'}</Button>
+        { isUpdated &&
+          <Button onClick={() => onConfirm()}>{game.ref ? 'Update' : 'Create'}</Button>
+        }
         {
-          actions?.map(action => (
+          !isUpdated && actions?.map(action => (
             <Button onClick={async () => {
               await action.action(game);
               onClose(true);
