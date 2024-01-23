@@ -30,6 +30,7 @@ export default function PlayingGames() {
     <GameRow
       games={games}
       dialog={{
+        type: 'game',
         title: 'Update a playing game',
         actions: [
           {
