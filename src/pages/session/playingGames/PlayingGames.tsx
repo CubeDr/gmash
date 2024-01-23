@@ -4,7 +4,7 @@ import {MembersContext} from '../../../providers/MembersContext';
 import Game from '../../../data/game';
 import GameRow from '../gameRow/GameRow';
 
-export default function UpcomingGames() {
+export default function PlayingGames() {
   const {members} = useContext(MembersContext);
   const [games, setGames] = useState<Game[]>([]);
 
@@ -12,18 +12,11 @@ export default function UpcomingGames() {
     return members.find(member => member.id === id)!;
   }
 
-  async function playGame(game: Game) {
-    if (game.ref == null) throw new Error('Game is not registered correctly.');
-
-    await firebase.delete(game.ref);
-    await firebase.addPlayingGame(game.team1.map(member => member.id), game.team2.map(member => member.id));
-  }
-
   useEffect(() => {
-    const unsubscribe = firebase.listenToUpcomingGames(upcomingGames => {
+    const unsubscribe = firebase.listenToPlayingGames(playingGames => {
       if (members.length === 0) return;
 
-      const games: Game[] = upcomingGames.map(game => ({
+      const games: Game[] = playingGames.map(game => ({
         team1: game.team1.map(id => getMemberById(id)),
         team2: game.team2.map(id => getMemberById(id)),
         ref: game.ref,
@@ -37,11 +30,11 @@ export default function UpcomingGames() {
     <GameRow
       games={games}
       dialog={{
-        title: 'Update an upcoming game',
+        title: 'Update a playing game',
         actions: [
           {
-            text: 'Play',
-            action: playGame,
+            text: 'Finish',
+            action: async () => {},
           }
         ],
       }}

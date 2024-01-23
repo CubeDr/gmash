@@ -2,7 +2,7 @@ import { QuerySnapshot, collection, doc, documentId, getDoc, getDocs, getFiresto
 import { getAuth, signInWithPopup, GoogleAuthProvider, User, onAuthStateChanged, signOut } from 'firebase/auth';
 import Firebase from './firebase';
 import { Member } from '../data/member';
-import { getDatabase, onValue, ref, set, push, DatabaseReference, remove } from 'firebase/database';
+import { getDatabase, onValue, ref, set, push, DatabaseReference, remove, Unsubscribe } from 'firebase/database';
 
 function snapshotToMembers(snapshot: QuerySnapshot) {
     const members: Member[] = [];
@@ -14,6 +14,25 @@ function snapshotToMembers(snapshot: QuerySnapshot) {
     });
 
     return members;
+}
+
+type GameCategory = 'upcoming' | 'playing';
+
+function addGame(category: GameCategory, game: {team1: string[], team2: string[]}): Promise<void> {
+    return set(push(ref(getDatabase(), category)), game);
+}
+
+function listenToGames(category: GameCategory, listener: (games: {team1: string[], team2: string[], ref: DatabaseReference}[]) => void): Unsubscribe {
+    return onValue(ref(getDatabase(), category), snapshot => {
+        const upcomingGames: {team1: string[], team2: string[], ref: DatabaseReference}[] = [];
+        snapshot.forEach(gameSnapshot => {
+            upcomingGames.push({
+                ...gameSnapshot.val(),
+                ref: gameSnapshot.ref,
+            });
+        });
+        listener(upcomingGames);
+    });
 }
 
 const firebaseImpl: Firebase = {
@@ -72,7 +91,6 @@ const firebaseImpl: Firebase = {
         } catch(e) {
             console.error(e);
         }
-        console.log('done');
     },
 
     listenToSessionMemberIds(listener: (ids: string[]) => void) {
@@ -82,24 +100,19 @@ const firebaseImpl: Firebase = {
     },
 
     addUpcomingGame(team1: string[], team2: string[]) {
-        return set(push(ref(getDatabase(), 'upcoming')), {team1, team2});
+        return addGame('upcoming', {team1, team2});
     },
 
     listenToUpcomingGames(listener: (games: {team1: string[], team2: string[], ref: DatabaseReference}[]) => void) {
-        return onValue(ref(getDatabase(), 'upcoming'), snapshot => {
-            const upcomingGames: {team1: string[], team2: string[], ref: DatabaseReference}[] = [];
-            snapshot.forEach(gameSnapshot => {
-                upcomingGames.push({
-                    ...gameSnapshot.val(),
-                    ref: gameSnapshot.ref,
-                });
-            });
-            listener(upcomingGames);
-        });
+        return listenToGames('upcoming', listener);
     },
 
     addPlayingGame(team1: string[], team2: string[]) {
-        return set(push(ref(getDatabase(), 'playing')), {team1, team2});
+        return addGame('playing', {team1, team2});
+    },
+
+    listenToPlayingGames(listener: (games: {team1: string[], team2: string[], ref: DatabaseReference}[]) => void) {
+        return listenToGames('playing', listener);
     },
 
     update(ref, value) {

@@ -19,6 +19,7 @@ export default interface Firebase {
     listenToUpcomingGames: (listener: (games: {team1: string[], team2: string[], ref: DatabaseReference}[]) => void) => Unsubscribe;
 
     addPlayingGame: (team1: string[], team2: string[]) => Promise<void>;
+    listenToPlayingGames: (listener: (games: {team1: string[], team2: string[], ref: DatabaseReference}[]) => void) => Unsubscribe;
 
     update: (ref: DatabaseReference, value: any) => Promise<void>;
     delete: (ref: DatabaseReference) => Promise<void>;

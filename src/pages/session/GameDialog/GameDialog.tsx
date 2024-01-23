@@ -6,7 +6,7 @@ import styles from './GameDialog.module.css';
 import firebase from "../../../firebase";
 import Game from '../../../data/game';
 
-interface GameDialogAction {
+export interface GameDialogAction {
   text: string;
   action: (game: Game) => Promise<void>;
 }

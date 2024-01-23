@@ -1,11 +1,11 @@
 import useSessionMembers from './useSessionMembers';
-import Court from './court/Court';
 import styles from './SessionPage.module.css';
 import {useState} from 'react';
 import {Member} from '../../data/member';
 import GameDialog from './GameDialog/GameDialog';
 import MemberItem from './memberItem/MemberItem';
 import UpcomingGames from "./upcomingGames/UpcomingGames";
+import PlayingGames from './playingGames/PlayingGames';
 
 export default function SessionPage() {
   const {members} = useSessionMembers();
@@ -37,10 +37,7 @@ export default function SessionPage() {
   return (
     <div className={selectedMembers.size > 0 ? styles.PaddingBottom : ''}>
       <h4 className={styles.SectionTitle}>Now playing</h4>
-      <Court game={{
-        team1: members.slice(0, 2),
-        team2: members.slice(2, 4),
-      }}/>
+      <PlayingGames />
       <h4 className={styles.SectionTitle}>Upcoming</h4>
       <UpcomingGames/>
       <h4 className={styles.SectionTitle}>Members</h4>
