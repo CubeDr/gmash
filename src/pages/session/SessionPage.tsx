@@ -1,13 +1,15 @@
 import useSessionMembers from './useSessionMembers';
 import styles from './SessionPage.module.css';
-import {useState} from 'react';
+import {useContext, useState} from 'react';
 import {Member} from '../../data/member';
 import GameDialog from './GameDialog/GameDialog';
 import MemberItem from './memberItem/MemberItem';
 import UpcomingGames from "./upcomingGames/UpcomingGames";
 import PlayingGames from './playingGames/PlayingGames';
+import { GooglerContext } from '../../providers/GooglerContext';
 
 export default function SessionPage() {
+  const {googler} = useContext(GooglerContext);
   const {members} = useSessionMembers();
   const [selectedMembers, setSelectedMembers] = useState<Set<Member>>(new Set());
   const [openMakeGameDialog, setOpenMakeGameDialog] = useState(false);
@@ -22,6 +24,10 @@ export default function SessionPage() {
   }
 
   function onMemberClick(member: Member) {
+    if (googler?.role !== 'organizer') {
+      return;
+    }
+
     const newSet = new Set(selectedMembers);
     if (selectedMembers.has(member)) {
       newSet.delete(member);
