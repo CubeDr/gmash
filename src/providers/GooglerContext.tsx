@@ -33,13 +33,13 @@ export function GooglerContextProvider({ children }: GooglerContextProviderProps
 
     useEffect(() => {
         const unsubscribe = firebase.onAuthStateChanged((user) => {
-            // if (user != null) {
-            //     if (!user.email?.endsWith('google.com')) {
-            //         alert('Only google.com emails are available.');
-            //         firebase.signOut();
-            //         return;
-            //     }
-            // }
+            if (user != null) {
+                if (!user.email?.endsWith('google.com')) {
+                    alert('Only google.com emails are available.');
+                    firebase.signOut();
+                    return;
+                }
+            }
             setUser(user);
         });
 
