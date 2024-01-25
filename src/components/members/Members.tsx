@@ -31,7 +31,7 @@ export default function Members({ mode, onSelectedMemberIdsChange }: MembersProp
                                     }
                                 }} />
                             }
-                            <label className={styles.Label} htmlFor={member.id}>{member.name} - {member.elo}</label>
+                            <label className={styles.Label} htmlFor={member.id}>{member.name}</label>
                         </li>
                     ))
                 }
