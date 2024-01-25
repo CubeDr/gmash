@@ -3,7 +3,6 @@ import Court from '../court/Court';
 import styles from './GameRow.module.css';
 import Game from '../../../data/game';
 import GameDialog, { GameDialogAction } from '../GameDialog/GameDialog';
-import FinishDialog from '../finishDialog/FinishDialog';
 
 interface GameRowProps {
     games: Game[],

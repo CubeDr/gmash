@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from 'react';
+import {useCallback, useContext, useEffect, useState} from 'react';
 import firebase from '../../../firebase';
 import {MembersContext} from '../../../providers/MembersContext';
 import Game from '../../../data/game';
@@ -10,9 +10,9 @@ export default function PlayingGames() {
   const [games, setGames] = useState<Game[]>([]);
   const [finishingGame, setFinishingGame] = useState<Game|null>(null);
 
-  function getMemberById(id: string) {
+  const getMemberById = useCallback((id: string) => {
     return members.find(member => member.id === id)!;
-  }
+  }, [members]);
 
   useEffect(() => {
     const unsubscribe = firebase.listenToPlayingGames(playingGames => {
@@ -26,7 +26,7 @@ export default function PlayingGames() {
       setGames(games);
     });
     return () => unsubscribe();
-  }, [members]);
+  }, [members, getMemberById]);
 
   return (
     <>

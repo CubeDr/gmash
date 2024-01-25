@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from 'react';
+import {useCallback, useContext, useEffect, useState} from 'react';
 import firebase from '../../../firebase';
 import {MembersContext} from '../../../providers/MembersContext';
 import Game from '../../../data/game';
@@ -8,9 +8,9 @@ export default function UpcomingGames() {
   const {members} = useContext(MembersContext);
   const [games, setGames] = useState<Game[]>([]);
 
-  function getMemberById(id: string) {
+  const getMemberById = useCallback((id: string) => {
     return members.find(member => member.id === id)!;
-  }
+  }, [members]);
 
   async function playGame(game: Game) {
     if (game.ref == null) throw new Error('Game is not registered correctly.');
@@ -31,7 +31,7 @@ export default function UpcomingGames() {
       setGames(games);
     });
     return () => unsubscribe();
-  }, [members]);
+  }, [members, getMemberById]);
 
   return (
     <GameRow
