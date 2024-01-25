@@ -19,6 +19,12 @@ export default function UpcomingGames() {
     await firebase.addPlayingGame(game.team1.map(member => member.id), game.team2.map(member => member.id));
   }
 
+  async function deleteGame(game: Game) {
+    if (game.ref == null) throw new Error('Game is not registered correctly.');
+
+    await firebase.delete(game.ref);
+  }
+
   useEffect(() => {
     const unsubscribe = firebase.listenToUpcomingGames(upcomingGames => {
       if (members.length === 0) return;
@@ -40,9 +46,13 @@ export default function UpcomingGames() {
         title: 'Update an upcoming game',
         actions: [
           {
+            text: 'Delete',
+            action: deleteGame,
+          },
+          {
             text: 'Play',
             action: playGame,
-          }
+          },
         ],
       }}
     />
