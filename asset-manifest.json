@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/gmash/static/css/main.e810670f.css",
+    "main.js": "/gmash/static/js/main.686ae36c.js",
+    "static/js/787.cbeb0772.chunk.js": "/gmash/static/js/787.cbeb0772.chunk.js",
+    "index.html": "/gmash/index.html",
+    "main.e810670f.css.map": "/gmash/static/css/main.e810670f.css.map",
+    "main.686ae36c.js.map": "/gmash/static/js/main.686ae36c.js.map",
+    "787.cbeb0772.chunk.js.map": "/gmash/static/js/787.cbeb0772.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e810670f.css",
+    "static/js/main.686ae36c.js"
+  ]
+}
