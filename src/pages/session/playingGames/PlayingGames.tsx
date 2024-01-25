@@ -3,10 +3,12 @@ import firebase from '../../../firebase';
 import {MembersContext} from '../../../providers/MembersContext';
 import Game from '../../../data/game';
 import GameRow from '../gameRow/GameRow';
+import FinishDialog from '../finishDialog/FinishDialog';
 
 export default function PlayingGames() {
   const {members} = useContext(MembersContext);
   const [games, setGames] = useState<Game[]>([]);
+  const [finishingGame, setFinishingGame] = useState<Game|null>(null);
 
   function getMemberById(id: string) {
     return members.find(member => member.id === id)!;
@@ -27,18 +29,30 @@ export default function PlayingGames() {
   }, [members]);
 
   return (
-    <GameRow
-      games={games}
-      dialog={{
-        type: 'game',
-        title: 'Update a playing game',
-        actions: [
-          {
-            text: 'Finish',
-            action: async () => {},
-          }
-        ],
-      }}
-    />
+    <>
+      <GameRow
+        games={games}
+        dialog={{
+          title: 'Update a playing game',
+          actions: [
+            {
+              text: 'Finish',
+              action: async (game) => {
+                setFinishingGame(game);
+              },
+            }
+          ],
+        }}
+      />
+      { finishingGame &&
+        <FinishDialog
+          game={finishingGame}
+          open={finishingGame != null}
+          onClose={() => {
+            setFinishingGame(null);
+          }}
+        />
+      }
+    </>
   );
 }

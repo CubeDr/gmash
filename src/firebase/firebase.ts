@@ -3,6 +3,10 @@ import { Googler } from '../data/googler';
 import { Member } from '../data/member';
 import { DatabaseReference } from 'firebase/database';
 
+interface GameResultTeam {
+    playersId: string[];
+    score: number;
+}
 export default interface Firebase {
     signIn: () => void;
     signOut: () => void;
@@ -20,6 +24,8 @@ export default interface Firebase {
 
     addPlayingGame: (team1: string[], team2: string[]) => Promise<void>;
     listenToPlayingGames: (listener: (games: {team1: string[], team2: string[], ref: DatabaseReference}[]) => void) => Unsubscribe;
+
+    addGameResult: (win: GameResultTeam, lose: GameResultTeam) => Promise<void>;
 
     update: (ref: DatabaseReference, value: any) => Promise<void>;
     delete: (ref: DatabaseReference) => Promise<void>;

@@ -1,4 +1,4 @@
-import { QuerySnapshot, collection, doc, documentId, getDoc, getDocs, getFirestore, query, setDoc, where } from 'firebase/firestore';
+import { addDoc, QuerySnapshot, collection, doc, documentId, getDoc, getDocs, getFirestore, query, setDoc, where } from 'firebase/firestore';
 import { getAuth, signInWithPopup, GoogleAuthProvider, User, onAuthStateChanged, signOut } from 'firebase/auth';
 import Firebase from './firebase';
 import { Member } from '../data/member';
@@ -113,6 +113,10 @@ const firebaseImpl: Firebase = {
 
     listenToPlayingGames(listener: (games: {team1: string[], team2: string[], ref: DatabaseReference}[]) => void) {
         return listenToGames('playing', listener);
+    },
+
+    async addGameResult(win, lose) {
+        await addDoc(collection(getFirestore(), 'gameResult'), {win, lose});
     },
 
     update(ref, value) {

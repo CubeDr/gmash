@@ -1,0 +1,24 @@
+.ScoreContainer {
+
+}
+
+.Row {
+    display: flex;
+    flex-direction: row;
+    padding: 8px;
+}
+
+.Players {
+    flex-grow: 1;
+}
+
+.PlayerName {
+    display: block;
+}
+
+.Score {
+    font-size: 32px;
+    text-align: center;
+    margin-left: 18px;
+    width: 60px;
+}

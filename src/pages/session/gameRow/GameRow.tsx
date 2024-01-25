@@ -8,7 +8,6 @@ import FinishDialog from '../finishDialog/FinishDialog';
 interface GameRowProps {
     games: Game[],
     dialog?: {
-        type: 'game'|'finish',
         title: string,
         actions?: GameDialogAction[];
     },
@@ -22,19 +21,13 @@ export default function GameRow({games, dialog} : GameRowProps) {
       {games.map((game, i) => (
         <Court key={'upcoming-' + i} game={game} onClick={() => setSelectedGame(game)}/>
       ))}
-      {selectedGame && dialog && dialog.type === 'game' &&
+      {selectedGame && dialog &&
         <GameDialog
           title={dialog.title}
           game={selectedGame}
           onClose={() => setSelectedGame(null)}
           open={selectedGame != null}
           actions={dialog.actions}/>
-      }
-      {selectedGame && dialog && dialog.type === 'finish' &&
-        <FinishDialog
-          game={selectedGame}
-          onClose={() => setSelectedGame(null)}
-          open={selectedGame != null}/>
       }
     </div>
   );
