@@ -12,9 +12,9 @@ export default function MemberItem({member, isSelected, onClick}: MemberItemProp
     <div className={styles.Member + ' ' + (isSelected ? styles.Selected : '')} onClick={() => onClick(member)}>
       <div className={styles.MemberRow}>
         <span>{member.name}</span>
-        <span>{member.elo}</span>
+        {/* <span>{member.elo}</span> */}
       </div>
-      <span className={styles.GamesToday}>0 played / 0 upcoming</span>
+      {/* <span className={styles.GamesToday}>0 played / 0 upcoming</span> */}
     </div>
   );
 }
