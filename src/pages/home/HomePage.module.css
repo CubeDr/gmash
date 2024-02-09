@@ -50,3 +50,14 @@
   text-align: center;
   width: 100%;
 }
+
+.Button:disabled {
+  background-color: lightgrey;
+}
+
+.ButtonGroup {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px;
+}
