@@ -99,7 +99,7 @@ def make_fake_db() -> https_fn.Response:
 
 
 @debug_bp.post("/add_game_result_with_names")
-def add_game_result_with_name() -> https_fn.Response:
+def add_game_result_with_names() -> https_fn.Response:
     """Add game result.
 
     Request example:
