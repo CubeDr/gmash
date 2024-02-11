@@ -4,12 +4,14 @@ from firebase_admin import initialize_app
 import flask
 
 import constants as c
-from debuggers import debug_bp
-import listeners
+
+from api.debuggers import debug_bp
+from api import listeners
 
 
 initialize_app()
 app = flask.Flask(__name__)
+
 app.register_blueprint(debug_bp)
 
 
@@ -20,8 +22,8 @@ def api(req: https_fn.Request) -> https_fn.Response:
 
 
 @firestore_fn.on_document_created(document=f"{c.GAME_RESULT}/{{resultId}}")
-def update_single_game_result(
+def update_records_from_single_game_result(
     event: firestore_fn.Event[firestore_fn.DocumentSnapshot | None],
 ) -> None:
     """Listen for gameResult doc creation, and update the members' records."""
-    listeners.update_single_game_result(event)
+    listeners.update_records_from_single_game_result(event)

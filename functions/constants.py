@@ -15,7 +15,15 @@ LOSE = "lose"
 WIN = "win"
 PLAYERS_ID = "playersId"
 SCORE = "score"
+SESSION_ID = "sessionId"
+TIMESTAMP = "timestamp"
 
 # Realtime DB
 
 MEMBERS = "members"
+SESSION = "session"
+ID = "id"
+
+# ELO computation
+
+DEFAULT_ELO = 1000
