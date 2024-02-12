@@ -99,6 +99,10 @@ const firebaseImpl: Firebase = {
         });
     },
 
+    async closeSession() {
+
+    },
+
     addUpcomingGame(team1: string[], team2: string[]) {
         return addGame('upcoming', {team1, team2});
     },
