@@ -58,7 +58,7 @@ export default function HomePage() {
   }
 
   function proceed() {
-    firebase.updateSessionMemberIds(Array.from(selectedMemberIds.current)).then(() => {
+    firebase.updateSessionMembers(Array.from(selectedMemberIds.current)).then(() => {
       navigate('/session');
     });
   }

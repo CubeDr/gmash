@@ -1,6 +1,7 @@
 import { Unsubscribe, User } from 'firebase/auth';
 import { Googler } from '../data/googler';
 import { Member } from '../data/member';
+import SessionMember from '../data/sessionMember';
 import { DatabaseReference } from 'firebase/database';
 
 interface GameResultTeam {
@@ -16,8 +17,8 @@ export default interface Firebase {
     getAllMembers: () => Promise<Member[]>;
     getMembersById: (ids: string[]) => Promise<Member[]>;
     
-    updateSessionMemberIds: (ids: string[]) => Promise<void>;
-    listenToSessionMemberIds: (listener: (ids: string[]) => void) => Unsubscribe;
+    updateSessionMembers: (ids: string[]) => Promise<void>;
+    listenToSessionMembers: (listener: (sessionMember: SessionMember[]) => void) => Unsubscribe;
 
     isSessionOpen: () => Promise<boolean>;
     createSession: () => Promise<void>;

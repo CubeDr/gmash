@@ -2,6 +2,7 @@ import { addDoc, QuerySnapshot, collection, doc, documentId, getDoc, getDocs, ge
 import { getAuth, signInWithPopup, GoogleAuthProvider, User, onAuthStateChanged, signOut } from 'firebase/auth';
 import Firebase from './firebase';
 import { Member } from '../data/member';
+import SessionMember from '../data/sessionMember';
 import { getDatabase, onValue, ref, get, set, push, DatabaseReference, remove, Unsubscribe } from 'firebase/database';
 
 let sessionId: string | null = null;
@@ -86,15 +87,17 @@ const firebaseImpl: Firebase = {
         return snapshotToMembers(snapshot);
     },
 
-    async updateSessionMemberIds(ids: string[]) {
+    async updateSessionMembers(ids: string[]) {
+        console.log(ids);
+        const sessionMembers = ids.map(id => ({id, upcoming: 0, played: 0}))
         try {
-            await set(ref(getDatabase(), 'members'), ids);
+            await set(ref(getDatabase(), 'members'), sessionMembers);
         } catch(e) {
             console.error(e);
         }
     },
 
-    listenToSessionMemberIds(listener: (ids: string[]) => void) {
+    listenToSessionMembers(listener: (sessionMembers: SessionMember[]) => void) {
         return onValue(ref(getDatabase(), 'members'), (snapshot) => {
             listener(snapshot.val());
         });
