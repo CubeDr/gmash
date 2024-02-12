@@ -88,6 +88,10 @@ def compute_elo(
 ) -> dict[str, int]:
     result = {}
 
+    result.update({p.id: p.elo - 1 for p in losers})
+    result.update({p.id: p.elo + 1 for p in winners})
+
+    """
     if len(winners) == 1 and len(losers) == 1:
         winner, loser = winners[0], losers[0]
         updated_elos = elo.calculate_updated_elos_for_singles(
@@ -111,5 +115,6 @@ def compute_elo(
             result[winner.id] = updated_elo
     else:
         raise ValueError("Not supported team configurations, probably skipped.")
+    """
 
     return result
