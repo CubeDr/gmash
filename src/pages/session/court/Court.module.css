@@ -1,27 +1,27 @@
 .Court {
-    background-color: var(--theme-color-0);
-    border-radius: 4px;
-    display: inline-block;
-    margin: 4px;
-    padding: 4px;
+  background-color: var(--theme-color-0);
+  border-radius: 4px;
+  display: inline-block;
+  margin: 4px;
+  padding: 4px;
 }
 
 .CourtContent {
-    display: flex;
-    flex-direction: column;
-    height: 120px;
-    width: 120px;
+  display: flex;
+  flex-direction: column;
+  height: 120px;
+  width: 120px;
 }
 
 .Team {
-    flex-grow: 1;
+  flex-grow: 1;
 }
 
 .Divider {
-    width: 80%;
+  width: 80%;
 }
 
 .Player {
-    display: block;
-    text-align: center;
+  display: block;
+  text-align: center;
 }

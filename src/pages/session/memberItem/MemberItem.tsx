@@ -1,4 +1,5 @@
-import {Member} from '../../../data/member';
+import { Member } from '../../../data/member';
+
 import styles from './MemberItem.module.css';
 
 interface MemberItemProps {
@@ -7,9 +8,16 @@ interface MemberItemProps {
   onClick: (member: Member) => void;
 }
 
-export default function MemberItem({member, isSelected, onClick}: MemberItemProps) {
+export default function MemberItem({
+  member,
+  isSelected,
+  onClick,
+}: MemberItemProps) {
   return (
-    <div className={styles.Member + ' ' + (isSelected ? styles.Selected : '')} onClick={() => onClick(member)}>
+    <div
+      className={styles.Member + ' ' + (isSelected ? styles.Selected : '')}
+      onClick={() => onClick(member)}
+    >
       <div className={styles.MemberRow}>
         <span>{member.name}</span>
         {/* <span>{member.elo}</span> */}
