@@ -1,5 +1,4 @@
 import collections
-from datetime import datetime
 from firebase_functions import https_fn
 from firebase_admin import db, firestore
 import flask
@@ -47,13 +46,7 @@ def update_all_game_records() -> https_fn.Response:
                 id_to_member[id].elo = updated_elo
 
         for doc in googlers:
-            doc.reference.update(
-                {
-                    c.ELO: id_to_member[doc.id].elo,
-                    c.NUM_PLAYED: num_played[doc.id],
-                    c.NUM_WINS: num_wins[doc.id],
-                }
-            )
+            doc.reference.update({c.ELO: id_to_member[doc.id].elo})
     except Exception as e:
         return https_fn.Response(f"Failed to update_game_record_entirely {e}")
     return https_fn.Response("Updated game records entirely")
@@ -74,23 +67,28 @@ def make_fake_db() -> https_fn.Response:
         games = store.collection(c.GAME_RESULT)
         common.delete_all_documents_of_collection(games)
 
-        db.reference(c.MEMBERS).update({i: id for i, id in enumerate(ids)})
-        db.reference(c.SESSION).update({c.ID: "__current_session_id__"})
+        db.reference(c.UPCOMING).delete()
+        db.reference(c.MEMBERS).delete()
+        db.reference(c.MEMBERS).update(
+            {id: {c.ID: id, c.PLAYED: 0, c.UPCOMING: 0} for id in ids}
+        )
+        db.reference(c.UPCOMING).update(
+            {
+                0: {c.TEAM1: [ids[0], ids[1]], c.TEAM2: [ids[2], ids[3]]},
+                1: {c.TEAM1: [ids[1], ids[2]], c.TEAM2: [ids[0], ids[3]]},
+            },
+        )
 
         games.add(
             {
                 c.WIN: {c.PLAYERS_ID: [ids[0], ids[1]], c.SCORE: 21},
                 c.LOSE: {c.PLAYERS_ID: [ids[2], ids[3]], c.SCORE: 15},
-                c.TIMESTAMP: datetime.now(),
-                c.SESSION_ID: "__current_session_id__",
             }
         )
         games.add(
             {
                 c.WIN: {c.PLAYERS_ID: [ids[0], ids[2]], c.SCORE: 21},
                 c.LOSE: {c.PLAYERS_ID: [ids[1], ids[3]], c.SCORE: 17},
-                c.TIMESTAMP: datetime.now(),
-                c.SESSION_ID: "__current_session_id__",
             }
         )
     except Exception as e:

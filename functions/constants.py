@@ -15,14 +15,15 @@ LOSE = "lose"
 WIN = "win"
 PLAYERS_ID = "playersId"
 SCORE = "score"
-SESSION_ID = "sessionId"
-TIMESTAMP = "timestamp"
 
 # Realtime DB
 
 MEMBERS = "members"
-SESSION = "session"
 ID = "id"
+PLAYED = "played"
+UPCOMING = "upcoming"
+TEAM1 = "team1"
+TEAM2 = "team2"
 
 # ELO computation
 

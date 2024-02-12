@@ -1,15 +1,10 @@
 import dataclasses
-from datetime import datetime
 from firebase_functions import https_fn
 from firebase_admin import db, firestore
 from typing import Any
 
 import constants as c
 import elo
-
-
-def get_current_session_id() -> str | None:
-    return db.reference(c.SESSION).get().to_dict().get(c.ID, None)
 
 
 def get_all_current_members_ids() -> list[str]:
@@ -26,8 +21,6 @@ class Googler:
     name: str
     elo: int
     role: str
-    num_played: int = 0
-    num_wins: int = 0
     id: str | None = None
 
     @classmethod
@@ -36,8 +29,6 @@ class Googler:
             name=data.get(c.NAME, ""),
             elo=data.get(c.ELO, c.DEFAULT_ELO),
             role=data.get(c.ROLE, "member"),
-            num_played=data.get(c.NUM_PLAYED, 0),
-            num_wins=data.get(c.NUM_WINS, 0),
             id=id,
         )
 
@@ -69,8 +60,6 @@ class TeamResult:
 class GameResult:
     win: TeamResult
     lose: TeamResult
-    session_id: str
-    timestamp: datetime
     id: str | None = None
 
     @classmethod
@@ -78,23 +67,13 @@ class GameResult:
         return GameResult(
             win=TeamResult.from_json(data.get(c.WIN, {})),
             lose=TeamResult.from_json(data.get(c.LOSE, {})),
-            session_id=data.get(c.SESSION_ID, ""),
-            timestamp=data.get(c.TIMESTAMP, datetime.now()),
             id=id,
         )
 
 
-def get_game_results(session_id: str | None = None) -> list[GameResult]:
+def get_game_results() -> list[GameResult]:
     store = firestore.client()
-    if session_id:
-        game_results = (
-            store.collection(c.GAME_RESULT)
-            .where(c.SESSION_ID, "==", session_id)
-            .order_by(c.TIMESTAMP)
-            .get()
-        )
-    else:
-        game_results = store.collection(c.GAME_RESULT).order_by(c.TIMESTAMP).get()
+    game_results = store.collection(c.GAME_RESULT).get()
     return [
         GameResult.from_json(game_result.to_dict(), id=game_result.reference.id)
         for game_result in game_results

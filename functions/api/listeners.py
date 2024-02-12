@@ -1,8 +1,41 @@
-from firebase_functions import firestore_fn
-from firebase_admin import firestore
+from firebase_functions import db_fn, firestore_fn
+from firebase_admin import db, firestore
+from typing import Any
 
 from api import common
 import constants as c
+
+
+def initialize_member(
+    event: db_fn.Event[Any] | None,
+) -> None:
+    """Listen for members DB creation, and initialize played and pending to 0."""
+    if event.data is None:
+        return
+    db.reference(event.reference).update({c.PLAYED: 0, c.UPCOMING: 0})
+
+
+def update_member_for_upcoming_db(
+    data: dict | None,
+    is_increment: bool = True,
+) -> None:
+    """Listen for upcoming DB creation, and change "upcoming" count for the members."""
+    if data is None:
+        return
+
+    def update_member_upcoming_transaction(current_data):
+        if current_data is None:
+            print(f"Member {id} not found, skipping update.")
+            return {}
+        current_data[c.UPCOMING] = current_data.get(
+            c.UPCOMING, 0 if is_increment else 1
+        ) + (1 if is_increment else -1)
+        return current_data
+
+    team1_ids, team2_ids = data[c.TEAM1], data[c.TEAM2]
+    for id in [*team1_ids.values(), *team2_ids.values()]:
+        ref = db.reference(f"/{c.MEMBERS}/{id}")
+        ref.transaction(update_member_upcoming_transaction)
 
 
 def update_records_from_single_game_result(
@@ -28,24 +61,17 @@ def update_records_from_single_game_result(
         updated_elos.update({player.id: player.elo for player in winners})
         updated_elos.update({player.id: player.elo for player in losers})
 
+    def increment_member_played_transaction(current_data):
+        if current_data is None:
+            print(f"Member {id} not found, skipping update.")
+            return {}
+        current_data[c.PLAYED] = current_data.get(c.PLAYED, 0) + 1
+        return current_data
+
     googlers = store.collection(c.GOOGLERS)
-    for winner in winners:
-        if (player_doc := googlers.document(winner.id).get()) is None:
-            continue
-        player_doc.reference.update(
-            {
-                c.ELO: updated_elos[winner.id],
-                c.NUM_PLAYED: winner.num_played + 1,
-                c.NUM_WINS: winner.num_wins + 1,
-            }
-        )
-    for loser in losers:
-        if (player_doc := googlers.document(loser.id).get()) is None:
-            continue
-        player_doc.reference.update(
-            {
-                c.ELO: updated_elos[loser.id],
-                c.NUM_PLAYED: loser.num_played + 1,
-                c.NUM_WINS: loser.num_wins,
-            }
+    for player in [*winners, *losers]:
+        if (player_doc := googlers.document(player.id).get()) is not None:
+            player_doc.reference.update({c.ELO: updated_elos[player.id]})
+        db.reference(f"/{c.MEMBERS}/{player.id}").transaction(
+            increment_member_played_transaction
         )
