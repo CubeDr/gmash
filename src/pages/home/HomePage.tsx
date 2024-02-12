@@ -74,9 +74,9 @@ export default function HomePage() {
         </div>
       }
       {showSignInButton() && <img alt='Sign in' className={styles.GoogleSignIn} src={googleSignIn} onClick={signIn} />}
-      {showRegisterButton() && <button className={styles.Button} onClick={(e) => register()}>Register</button>}
-      {showStartSessionButton() && <button className={styles.Button} onClick={(e) => startSession()}>Start Session</button>}
-      {showProceedButton() && <button className={styles.Button} onClick={(e) => proceed()}>Proceed with {selectedMembersCount} members</button>}
+      {showRegisterButton() && <button className={styles.Button} onClick={() => register()}>Register</button>}
+      {showStartSessionButton() && <button className={styles.Button} onClick={() => startSession()}>Start Session</button>}
+      {showProceedButton() && <button className={styles.Button} onClick={() => proceed()}>Proceed with {selectedMembersCount} members</button>}
     </div>
   );
 }
