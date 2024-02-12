@@ -2,7 +2,7 @@ import { addDoc, QuerySnapshot, collection, doc, documentId, getDoc, getDocs, ge
 import { getAuth, signInWithPopup, GoogleAuthProvider, User, onAuthStateChanged, signOut } from 'firebase/auth';
 import Firebase from './firebase';
 import { Member } from '../data/member';
-import { getDatabase, onValue, ref, set, push, DatabaseReference, remove, Unsubscribe } from 'firebase/database';
+import { getDatabase, onValue, ref, get, set, push, DatabaseReference, remove, Unsubscribe } from 'firebase/database';
 
 let sessionId: string | null = null;
 
@@ -106,7 +106,16 @@ const firebaseImpl: Firebase = {
     },
 
     async closeSession() {
-
+      const members = (await get(ref(getDatabase(), 'members'))).val();
+      await addDoc(collection(getFirestore(), 'session'), {
+        id: sessionId,
+        members,
+      });
+      await remove(ref(getDatabase(), 'sessionId'));
+      await remove(ref(getDatabase(), 'members'));
+      await remove(ref(getDatabase(), 'upcoming'));
+      await remove(ref(getDatabase(), 'playing'));
+      sessionId = null;
     },
 
     addUpcomingGame(team1: string[], team2: string[]) {
