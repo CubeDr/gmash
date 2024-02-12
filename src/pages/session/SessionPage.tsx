@@ -1,7 +1,7 @@
 import useSessionMembers from './useSessionMembers';
 import styles from './SessionPage.module.css';
 import {useContext, useEffect, useState} from 'react';
-import {Member} from '../../data/member';
+import Member from '../../data/member';
 import GameDialog from './GameDialog/GameDialog';
 import MemberItem from './memberItem/MemberItem';
 import UpcomingGames from "./upcomingGames/UpcomingGames";

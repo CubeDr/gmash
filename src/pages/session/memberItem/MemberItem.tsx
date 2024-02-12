@@ -1,4 +1,4 @@
-import {Member} from '../../../data/member';
+import Member from '../../../data/member';
 import styles from './MemberItem.module.css';
 
 interface MemberItemProps {

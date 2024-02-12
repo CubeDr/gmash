@@ -3,7 +3,7 @@ import firebase from '../../../firebase';
 import Game from '../../../data/game';
 import GameRow from '../gameRow/GameRow';
 import FinishDialog from '../finishDialog/FinishDialog';
-import { Member } from '../../../data/member';
+import Member from '../../../data/member';
 
 interface Props {
   members: Member[]

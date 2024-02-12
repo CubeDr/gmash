@@ -1,6 +1,6 @@
 import { Unsubscribe, User } from 'firebase/auth';
 import { Googler } from '../data/googler';
-import { Member } from '../data/member';
+import Member from '../data/member';
 import {IDBySessionMember} from '../data/sessionMember';
 import { DatabaseReference } from 'firebase/database';
 

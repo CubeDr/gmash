@@ -2,7 +2,7 @@ import {useCallback, useEffect, useState} from 'react';
 import firebase from '../../../firebase';
 import Game from '../../../data/game';
 import GameRow from '../gameRow/GameRow';
-import { Member } from '../../../data/member';
+import Member from '../../../data/member';
 
 interface Props {
   members: Member[]

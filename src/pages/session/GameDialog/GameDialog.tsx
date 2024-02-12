@@ -1,5 +1,5 @@
 import {Button, Dialog, DialogActions, DialogTitle} from '@mui/material'
-import {Member} from '../../../data/member';
+import Member from '../../../data/member';
 import {useEffect, useState} from 'react';
 import MemberItem from '../memberItem/MemberItem';
 import styles from './GameDialog.module.css';

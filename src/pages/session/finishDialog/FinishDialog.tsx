@@ -3,7 +3,7 @@ import Game from '../../../data/game';
 import styles from './FinishDialog.module.css';
 import { useRef } from 'react';
 import firebase from '../../../firebase';
-import { Member } from '../../../data/member';
+import Member from '../../../data/member';
 
 interface FinishDialogProps {
     game: Game,

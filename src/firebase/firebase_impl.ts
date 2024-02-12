@@ -1,8 +1,8 @@
 import { addDoc, QuerySnapshot, collection, doc, documentId, getDoc, getDocs, getFirestore, query, setDoc, where } from 'firebase/firestore';
 import { getAuth, signInWithPopup, GoogleAuthProvider, User, onAuthStateChanged, signOut } from 'firebase/auth';
 import Firebase from './firebase';
-import { Member } from '../data/member';
 import {IDBySessionMember} from '../data/sessionMember';
+import Member from '../data/member';
 import { getDatabase, onValue, ref, get, set, push, DatabaseReference, remove, Unsubscribe } from 'firebase/database';
 
 let sessionId: string | null = null;
