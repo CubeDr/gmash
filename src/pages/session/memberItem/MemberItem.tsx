@@ -14,7 +14,8 @@ export default function MemberItem({member, isSelected, onClick}: MemberItemProp
         <span>{member.name}</span>
         {/* <span>{member.elo}</span> */}
       </div>
-      {/* <span className={styles.GamesToday}>0 played / 0 upcoming</span> */}
+      <>{console.log(member, member.played)}</>
+      <span className={styles.GamesToday}>{member.played} played / {member.upcoming} upcoming</span>
     </div>
   );
 }

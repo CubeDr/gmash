@@ -64,9 +64,9 @@ export default function SessionPage() {
   return (
     <div className={selectedMembers.size > 0 ? styles.PaddingBottom : ''}>
       <h4 className={styles.SectionTitle}>Now playing</h4>
-      <PlayingGames/>
+      <PlayingGames members={members} />
       <h4 className={styles.SectionTitle}>Upcoming</h4>
-      <UpcomingGames/>
+      <UpcomingGames members={members} />
       <h4 className={styles.SectionTitle}>Members</h4>
       <div className={styles.Members}>
         {

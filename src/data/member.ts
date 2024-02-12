@@ -3,4 +3,6 @@ export interface Member {
     name: string;
     elo: number;
     role: 'member' | 'organizer';
+    played?: number;
+    upcoming?: number;
 }
