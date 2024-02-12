@@ -87,7 +87,6 @@ const firebaseImpl: Firebase = {
     },
 
     async updateSessionMemberIds(ids: string[]) {
-        console.log(ids);
         try {
             await set(ref(getDatabase(), 'members'), ids);
         } catch(e) {
