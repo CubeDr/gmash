@@ -16,9 +16,17 @@ def update_records_from_single_game_result(
 
     winners = common.get_googlers_of_ids(game_result.win.playersId)
     losers = common.get_googlers_of_ids(game_result.lose.playersId)
-    updated_elo = common.compute_elo(
-        winners, losers, game_result.win.score, game_result.lose.score
-    )
+    try:
+        updated_elos = common.compute_elo(
+            winners, losers, game_result.win.score, game_result.lose.score
+        )
+    except ValueError as e:
+        print(
+            f"Value error occurred when computing ELOs from {game_result}, will be omitted."
+        )
+        updated_elos = {}
+        updated_elos.update({player.id: player.elo for player in winners})
+        updated_elos.update({player.id: player.elo for player in losers})
 
     googlers = store.collection(c.GOOGLERS)
     for winner in winners:
@@ -26,7 +34,7 @@ def update_records_from_single_game_result(
             continue
         player_doc.reference.update(
             {
-                c.ELO: updated_elo[winner.id],
+                c.ELO: updated_elos[winner.id],
                 c.NUM_PLAYED: winner.num_played + 1,
                 c.NUM_WINS: winner.num_wins + 1,
             }
@@ -36,7 +44,7 @@ def update_records_from_single_game_result(
             continue
         player_doc.reference.update(
             {
-                c.ELO: updated_elo[loser.id],
+                c.ELO: updated_elos[loser.id],
                 c.NUM_PLAYED: loser.num_played + 1,
                 c.NUM_WINS: loser.num_wins,
             }

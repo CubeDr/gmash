@@ -5,6 +5,7 @@ from firebase_admin import db, firestore
 from typing import Any
 
 import constants as c
+import elo
 
 
 def get_current_session_id() -> str | None:
@@ -106,8 +107,30 @@ def compute_elo(
     win_score: int,
     lose_score: int,
 ) -> dict[str, int]:
-    # TODO: Implement ELO computation here
     result = {}
-    result.update({player.id: player.elo + 1 for player in winners})
-    result.update({player.id: player.elo - 1 for player in losers})
+
+    if len(winners) == 1 and len(losers) == 1:
+        winner, loser = winners[0], losers[0]
+        updated_elos = elo.calculate_updated_elos_for_singles(
+            team_a_elo=loser.elo,
+            team_b_elo=winner.elo,
+            team_a_score=lose_score,
+            team_b_score=win_score,
+        )
+        result[loser.id] = updated_elos["team_a_elo"][0]
+        result[winner.id] = updated_elos["team_b_elo"][0]
+    elif len(winners) == 2 and len(losers) == 2:
+        updated_elos = elo.calculate_updated_elos_for_doubles(
+            team_a_elo=[p.elo for p in losers],
+            team_b_elo=[p.elo for p in winners],
+            team_a_score=lose_score,
+            team_b_score=win_score,
+        )
+        for loser, updated_elo in zip(losers, updated_elos["team_a_elo"]):
+            result[loser.id] = updated_elo
+        for winner, updated_elo in zip(winners, updated_elos["team_b_elo"]):
+            result[winner.id] = updated_elo
+    else:
+        raise ValueError("Not supported team configurations, probably skipped.")
+
     return result

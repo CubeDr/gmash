@@ -27,3 +27,8 @@ ID = "id"
 # ELO computation
 
 DEFAULT_ELO = 1000
+P_ELO = 0.6
+Q_ELO = 1 - P_ELO
+T_ELO = 0.2
+C_ELO = 1.0
+T_SCORE = 0.001667
