@@ -1,11 +1,14 @@
-import {useCallback, useContext, useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import firebase from '../../../firebase';
-import {MembersContext} from '../../../providers/MembersContext';
 import Game from '../../../data/game';
 import GameRow from '../gameRow/GameRow';
+import { Member } from '../../../data/member';
 
-export default function UpcomingGames() {
-  const {members} = useContext(MembersContext);
+interface Props {
+  members: Member[]
+}
+
+export default function UpcomingGames({ members }: Props) {
   const [games, setGames] = useState<Game[]>([]);
 
   const getMemberById = useCallback((id: string) => {
