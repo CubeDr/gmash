@@ -48,6 +48,7 @@ export default function HomePage() {
   }
 
   function startSession() {
+    firebase.createSession();
     setIsSelectingMember(true);
   }
 

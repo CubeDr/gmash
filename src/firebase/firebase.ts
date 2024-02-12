@@ -18,6 +18,7 @@ export default interface Firebase {
     
     updateSessionMemberIds: (ids: string[]) => Promise<void>;
     listenToSessionMemberIds: (listener: (ids: string[]) => void) => Unsubscribe;
+    createSession: () => Promise<void>;
     closeSession: () => Promise<void>;
 
     addUpcomingGame: (team1: string[], team2: string[]) => Promise<void>;

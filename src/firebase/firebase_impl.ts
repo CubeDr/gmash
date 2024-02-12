@@ -4,6 +4,8 @@ import Firebase from './firebase';
 import { Member } from '../data/member';
 import { getDatabase, onValue, ref, set, push, DatabaseReference, remove, Unsubscribe } from 'firebase/database';
 
+let sessionId: string | null = null;
+
 function snapshotToMembers(snapshot: QuerySnapshot) {
     const members: Member[] = [];
     snapshot.forEach(doc => {
@@ -95,8 +97,13 @@ const firebaseImpl: Firebase = {
 
     listenToSessionMemberIds(listener: (ids: string[]) => void) {
         return onValue(ref(getDatabase(), 'members'), (snapshot) => {
-            listener(snapshot.val());
+            // listener(snapshot.val());
         });
+    },
+
+    async createSession() {
+        sessionId = Date.now().toString();
+        await set(ref(getDatabase(), 'sessionId'), sessionId);
     },
 
     async closeSession() {
