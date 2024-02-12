@@ -97,7 +97,7 @@ const firebaseImpl: Firebase = {
 
     listenToSessionMemberIds(listener: (ids: string[]) => void) {
         return onValue(ref(getDatabase(), 'members'), (snapshot) => {
-            // listener(snapshot.val());
+            listener(snapshot.val());
         });
     },
 
@@ -127,7 +127,7 @@ const firebaseImpl: Firebase = {
     },
 
     async addGameResult(win, lose) {
-        await addDoc(collection(getFirestore(), 'gameResult'), {win, lose});
+        await addDoc(collection(getFirestore(), 'gameResult'), {win, lose, sessionId});
     },
 
     update(ref, value) {
