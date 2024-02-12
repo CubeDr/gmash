@@ -1,6 +1,6 @@
 import useSessionMembers from './useSessionMembers';
 import styles from './SessionPage.module.css';
-import {useContext, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {Member} from '../../data/member';
 import GameDialog from './GameDialog/GameDialog';
 import MemberItem from './memberItem/MemberItem';
@@ -52,6 +52,14 @@ export default function SessionPage() {
   function showSessionCloseButton() {
     return googler?.role === 'organizer';
   }
+
+  useEffect(() => {
+    firebase.isSessionOpen().then(isOpen => {
+      if (!isOpen) {
+        navigate('/');
+      }
+    });
+  }, [navigate]);
 
   return (
     <div className={selectedMembers.size > 0 ? styles.PaddingBottom : ''}>

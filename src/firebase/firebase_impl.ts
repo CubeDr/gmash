@@ -100,6 +100,17 @@ const firebaseImpl: Firebase = {
         });
     },
 
+    async isSessionOpen() {
+        const val = (await get(ref(getDatabase(), 'sessionId'))).val();
+        if (val == null) {
+          sessionId = null;
+          return false;
+        }
+
+        sessionId = val;
+        return true;
+    },
+
     async createSession() {
         sessionId = Date.now().toString();
         await set(ref(getDatabase(), 'sessionId'), sessionId);

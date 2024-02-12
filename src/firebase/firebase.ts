@@ -18,6 +18,8 @@ export default interface Firebase {
     
     updateSessionMemberIds: (ids: string[]) => Promise<void>;
     listenToSessionMemberIds: (listener: (ids: string[]) => void) => Unsubscribe;
+
+    isSessionOpen: () => Promise<boolean>;
     createSession: () => Promise<void>;
     closeSession: () => Promise<void>;
 
