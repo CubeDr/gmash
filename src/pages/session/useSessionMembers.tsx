@@ -1,19 +1,20 @@
-import {useContext, useEffect, useState} from 'react';
-import {MembersContext} from '../../providers/MembersContext';
+import { useContext, useEffect, useState } from 'react';
+
 import Member from '../../data/member';
 import firebase from '../../firebase';
+import { MembersContext } from '../../providers/MembersContext';
 
 export default function useSelectedMembers() {
-  const {members} = useContext(MembersContext);
+  const { members } = useContext(MembersContext);
   const [sessionMembers, setSessionMembers] = useState<Member[]>([]);
 
   useEffect(() => {
-    const unsubscribe = firebase.listenToSessionMembers(sessionMemberMap => {
+    const unsubscribe = firebase.listenToSessionMembers((sessionMemberMap) => {
       const selected = members
-        .filter(member => member.id in sessionMemberMap)
-        .map(member => {
+        .filter((member) => member.id in sessionMemberMap)
+        .map((member) => {
           const sessionInfo = sessionMemberMap[member.id];
-          return {...member, ...sessionInfo}
+          return { ...member, ...sessionInfo };
         });
 
       setSessionMembers(selected);
@@ -21,5 +22,5 @@ export default function useSelectedMembers() {
     return () => unsubscribe();
   }, [members]);
 
-  return {members: sessionMembers};
+  return { members: sessionMembers };
 }

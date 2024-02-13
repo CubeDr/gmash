@@ -1,19 +1,23 @@
-import useSessionMembers from './useSessionMembers';
-import styles from './SessionPage.module.css';
-import {useContext, useEffect, useState} from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import Member from '../../data/member';
-import GameDialog from './GameDialog/GameDialog';
-import MemberItem from './memberItem/MemberItem';
-import UpcomingGames from "./upcomingGames/UpcomingGames";
-import PlayingGames from './playingGames/PlayingGames';
-import {GooglerContext} from '../../providers/GooglerContext';
 import firebase from '../../firebase';
-import {useNavigate} from "react-router-dom";
+import { GooglerContext } from '../../providers/GooglerContext';
+
+import GameDialog from './GameDialog/GameDialog';
+import styles from './SessionPage.module.css';
+import MemberItem from './memberItem/MemberItem';
+import PlayingGames from './playingGames/PlayingGames';
+import UpcomingGames from './upcomingGames/UpcomingGames';
+import useSessionMembers from './useSessionMembers';
 
 export default function SessionPage() {
-  const {googler} = useContext(GooglerContext);
-  const {members} = useSessionMembers();
-  const [selectedMembers, setSelectedMembers] = useState<Set<Member>>(new Set());
+  const { googler } = useContext(GooglerContext);
+  const { members } = useSessionMembers();
+  const [selectedMembers, setSelectedMembers] = useState<Set<Member>>(
+    new Set()
+  );
   const [openMakeGameDialog, setOpenMakeGameDialog] = useState(false);
   const navigate = useNavigate();
 
@@ -54,7 +58,7 @@ export default function SessionPage() {
   }
 
   useEffect(() => {
-    firebase.isSessionOpen().then(isOpen => {
+    firebase.isSessionOpen().then((isOpen) => {
       if (!isOpen) {
         navigate('/');
       }
@@ -69,32 +73,31 @@ export default function SessionPage() {
       <UpcomingGames members={members} />
       <h4 className={styles.SectionTitle}>Members</h4>
       <div className={styles.Members}>
-        {
-          members.map(member => (
-            <MemberItem key={member.id}
-                        member={member}
-                        isSelected={selectedMembers.has(member)}
-                        onClick={onMemberClick}/>
-          ))
-        }
+        {members.map((member) => (
+          <MemberItem
+            key={member.id}
+            member={member}
+            isSelected={selectedMembers.has(member)}
+            onClick={onMemberClick}
+          />
+        ))}
       </div>
-      {selectedMembers.size > 0 &&
+      {selectedMembers.size > 0 && (
         <button
           className={styles.Button}
           onClick={() => setOpenMakeGameDialog(true)}
-          disabled={selectedMembers.size % 2 === 1}>
+          disabled={selectedMembers.size % 2 === 1}
+        >
           Make a game ({selectedMembers.size})
         </button>
-      }
-      {showSessionCloseButton() &&
-        <button
-          className={styles.Button}
-          onClick={() => closeSession()}>
+      )}
+      {showSessionCloseButton() && (
+        <button className={styles.Button} onClick={() => closeSession()}>
           Close Session
         </button>
-      }
+      )}
       <GameDialog
-        title='Make a new game'
+        title="Make a new game"
         open={openMakeGameDialog}
         onClose={(success) => {
           if (success) {
@@ -102,7 +105,8 @@ export default function SessionPage() {
           }
           setOpenMakeGameDialog(false);
         }}
-        game={makeGameFromSelectedMembers()}/>
+        game={makeGameFromSelectedMembers()}
+      />
     </div>
   );
 }

@@ -1,48 +1,63 @@
 .HomePage {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    padding-top: 32px;
-    padding-bottom: 48px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-top: 32px;
+  padding-bottom: 48px;
 }
 
 .Title {
-    background: -webkit-linear-gradient(60deg, var(--theme-color-2), var(--theme-color-5));
-    background-clip: text;
-    color: transparent;
-    font-size: 48px;
-    font-weight: 900;
-    text-align: center;
+  background: -webkit-linear-gradient(
+    60deg,
+    var(--theme-color-2),
+    var(--theme-color-5)
+  );
+  background-clip: text;
+  color: transparent;
+  font-size: 48px;
+  font-weight: 900;
+  text-align: center;
 }
 
 .MembersContainer {
-    flex-grow: 1;
-    overflow-y: scroll;
+  flex-grow: 1;
+  overflow-y: scroll;
 }
 
 .GoogleSignIn {
-    left: 50%;
-    bottom: 80px;
-    display: block;
-    margin: 0 auto;
-    position: absolute;
-    transform: translateX(-50%);
-    width: 220px;
+  left: 50%;
+  bottom: 80px;
+  display: block;
+  margin: 0 auto;
+  position: absolute;
+  transform: translateX(-50%);
+  width: 220px;
 }
 
 .Button {
-    --border: 1px solid white;
-    background-color: var(--theme-color-2);
-    border-bottom: var(--border);
-    border-left: none;
-    border-right: none;
-    border-top: var(--border);
-    color: var(--theme-color-0);
-    display: block;
-    font-size: 16px;
-    margin-top: 32px;
-    padding: 16px;
-    text-align: center;
-    width: 100%;
+  --border: 1px solid white;
+  background-color: var(--theme-color-2);
+  border-bottom: var(--border);
+  border-left: none;
+  border-right: none;
+  border-top: var(--border);
+  color: var(--theme-color-0);
+  display: block;
+  font-size: 16px;
+  margin-top: 32px;
+  padding: 16px;
+  text-align: center;
+  width: 100%;
+}
+
+.Button:disabled {
+  background-color: lightgrey;
+}
+
+.ButtonGroup {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px;
 }

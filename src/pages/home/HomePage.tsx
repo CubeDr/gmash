@@ -1,10 +1,13 @@
-import styles from './HomePage.module.css';
-import googleSignIn from './google_signin.png';
-import Members from '../../components/members/Members';
+import { Button } from '@mui/material';
 import { useContext, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import Members from '../../components/members/Members';
 import firebase from '../../firebase';
 import { GooglerContext } from '../../providers/GooglerContext';
+
+import styles from './HomePage.module.css';
+import googleSignIn from './google_signin.png';
 
 export default function HomePage() {
   const { googler, refetch } = useContext(GooglerContext);
@@ -33,6 +36,11 @@ export default function HomePage() {
     return googler?.role === 'organizer' && isSelectingMember;
   }
 
+  function showViewSessionButton() {
+    // TODO: show this button only if the session exists
+    return googler != null;
+  }
+
   function signIn() {
     firebase.signIn();
   }
@@ -58,25 +66,72 @@ export default function HomePage() {
   }
 
   function proceed() {
-    firebase.updateSessionMembers(Array.from(selectedMemberIds.current)).then(() => {
-      navigate('/session');
-    });
+    firebase
+      .updateSessionMembers(Array.from(selectedMemberIds.current))
+      .then(() => {
+        navigate('/session');
+      });
   }
 
   return (
     <div className={styles.HomePage}>
       <div className={styles.Title}>GMASH</div>
-      {showMembers() &&
+      {showMembers() && (
         <div className={styles.MembersContainer}>
           <Members
             mode={isSelectingMember ? 'select' : 'view'}
-            onSelectedMemberIdsChange={onSelectedMemberIdsChange} />
+            onSelectedMemberIdsChange={onSelectedMemberIdsChange}
+          />
         </div>
-      }
-      {showSignInButton() && <img alt='Sign in' className={styles.GoogleSignIn} src={googleSignIn} onClick={signIn} />}
-      {showRegisterButton() && <button className={styles.Button} onClick={() => register()}>Register</button>}
-      {showStartSessionButton() && <button className={styles.Button} onClick={() => startSession()}>Start Session</button>}
-      {showProceedButton() && <button className={styles.Button} onClick={() => proceed()}>Proceed with {selectedMembersCount} members</button>}
+      )}
+      {showSignInButton() && (
+        <img
+          alt="Sign in"
+          className={styles.GoogleSignIn}
+          src={googleSignIn}
+          onClick={signIn}
+        />
+      )}
+      {showRegisterButton() && (
+        <button className={styles.Button} onClick={() => register()}>
+          Register
+        </button>
+      )}
+      <div className={styles.ButtonGroup}>
+        {showViewSessionButton() && (
+          <Button
+            className={styles.Button}
+            variant="outlined"
+            size="large"
+            href="/gmash/session"
+          >
+            View Session
+          </Button>
+        )}
+        {showStartSessionButton() && (
+          <Button
+            className={styles.Button}
+            variant="contained"
+            size="large"
+            onClick={() => startSession()}
+          >
+            Start Session
+          </Button>
+        )}
+        {showProceedButton() && (
+          <Button
+            className={styles.Button}
+            variant="contained"
+            size="large"
+            disabled={selectedMembersCount === 0}
+            onClick={() => {
+              proceed();
+            }}
+          >
+            Proceed with {selectedMembersCount} members
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
