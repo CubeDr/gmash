@@ -1,13 +1,16 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import Game from '../../../data/game';
+import Member from '../../../data/member';
 import firebase from '../../../firebase';
-import { MembersContext } from '../../../providers/MembersContext';
 import FinishDialog from '../finishDialog/FinishDialog';
 import GameRow from '../gameRow/GameRow';
 
-export default function PlayingGames() {
-  const { members } = useContext(MembersContext);
+interface Props {
+  members: Member[];
+}
+
+export default function PlayingGames({ members }: Props) {
   const [games, setGames] = useState<Game[]>([]);
   const [finishingGame, setFinishingGame] = useState<Game | null>(null);
 

@@ -31,7 +31,8 @@ import {
   where,
 } from 'firebase/firestore';
 
-import { Member } from '../data/member';
+import Member from '../data/member';
+import { IDBySessionMember } from '../data/sessionMember';
 
 import Firebase from './firebase';
 
@@ -133,15 +134,25 @@ const firebaseImpl: Firebase = {
     return snapshotToMembers(snapshot);
   },
 
-  async updateSessionMemberIds(ids: string[]) {
+  async updateSessionMembers(ids: string[]) {
+    const sessionMembers: IDBySessionMember = {};
+
+    ids.forEach((id) => {
+      sessionMembers[id] = { played: 0, upcoming: 0 };
+    });
+
+    console.log(sessionMembers);
+
     try {
-      await set(ref(getDatabase(), 'members'), ids);
+      await set(ref(getDatabase(), 'members'), sessionMembers);
     } catch (e) {
       console.error(e);
     }
   },
 
-  listenToSessionMemberIds(listener: (ids: string[]) => void) {
+  listenToSessionMembers(
+    listener: (sessionMembers: IDBySessionMember) => void
+  ) {
     return onValue(ref(getDatabase(), 'members'), (snapshot) => {
       listener(snapshot.val());
     });

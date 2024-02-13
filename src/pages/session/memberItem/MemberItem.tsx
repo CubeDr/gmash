@@ -1,4 +1,4 @@
-import { Member } from '../../../data/member';
+import Member from '../../../data/member';
 
 import styles from './MemberItem.module.css';
 
@@ -22,7 +22,9 @@ export default function MemberItem({
         <span>{member.name}</span>
         {/* <span>{member.elo}</span> */}
       </div>
-      {/* <span className={styles.GamesToday}>0 played / 0 upcoming</span> */}
+      <span className={styles.GamesToday}>
+        {member.played} played / {member.upcoming} upcoming
+      </span>
     </div>
   );
 }

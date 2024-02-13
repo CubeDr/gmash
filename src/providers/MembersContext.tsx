@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react';
 
-import { Member } from '../data/member';
+import Member from '../data/member';
 import firebase from '../firebase';
 
 import { GooglerContext } from './GooglerContext';

@@ -1,5 +1,5 @@
 import Game from '../../data/game';
-import { Member } from '../../data/member';
+import Member from '../../data/member';
 
 export function makeGameFromMembers(members: Set<Member>): Game {
   const sorted = Array.from(members).sort((a, b) => b.elo - a.elo);

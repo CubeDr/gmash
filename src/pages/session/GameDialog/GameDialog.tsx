@@ -2,7 +2,7 @@ import { Button, Dialog, DialogActions, DialogTitle } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import Game from '../../../data/game';
-import { Member } from '../../../data/member';
+import Member from '../../../data/member';
 import firebase from '../../../firebase';
 import MemberItem from '../memberItem/MemberItem';
 

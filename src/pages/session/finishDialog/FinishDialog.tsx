@@ -2,7 +2,7 @@ import { Button, Dialog, DialogActions, DialogTitle } from '@mui/material';
 import { useRef } from 'react';
 
 import Game from '../../../data/game';
-import { Member } from '../../../data/member';
+import Member from '../../../data/member';
 import firebase from '../../../firebase';
 
 import styles from './FinishDialog.module.css';
