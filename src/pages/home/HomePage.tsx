@@ -103,7 +103,7 @@ export default function HomePage() {
             className={styles.Button}
             variant="outlined"
             size="large"
-            href="/session"
+            href="/gmash/session"
           >
             View Session
           </Button>
