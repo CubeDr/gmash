@@ -1,30 +1,30 @@
 .PaddingBottom {
-    padding-bottom: 51px;
+  padding-bottom: 51px;
 }
 
 .SectionTitle {
-    margin-left: 18px;
+  margin-left: 18px;
 }
 
 .Members {
-    background-color: var(--theme-color-0);
-    border-radius: 8px;
-    margin: 8px;
-    padding: 8px 0;
+  background-color: var(--theme-color-0);
+  border-radius: 8px;
+  margin: 8px;
+  padding: 8px 0;
 }
 
 .Button {
-    background-color: var(--theme-color-4);
-    bottom: 0;
-    border: none;
-    color: var(--theme-color-0);
-    padding: 18px;
-    position: fixed;
-    width: 100%;
+  background-color: var(--theme-color-4);
+  bottom: 0;
+  border: none;
+  color: var(--theme-color-0);
+  padding: 18px;
+  position: fixed;
+  width: 100%;
 
-    transition: background-color 120ms;
+  transition: background-color 120ms;
 }
 
 .Button:disabled {
-    background-color: lightgrey;
+  background-color: lightgrey;
 }

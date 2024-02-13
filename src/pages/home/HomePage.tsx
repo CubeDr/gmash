@@ -1,10 +1,12 @@
-import styles from './HomePage.module.css';
-import googleSignIn from './google_signin.png';
-import Members from '../../components/members/Members';
 import { useContext, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import Members from '../../components/members/Members';
 import firebase from '../../firebase';
 import { GooglerContext } from '../../providers/GooglerContext';
+
+import styles from './HomePage.module.css';
+import googleSignIn from './google_signin.png';
 
 export default function HomePage() {
   const { googler, refetch } = useContext(GooglerContext);
@@ -58,25 +60,47 @@ export default function HomePage() {
   }
 
   function proceed() {
-    firebase.updateSessionMemberIds(Array.from(selectedMemberIds.current)).then(() => {
-      navigate('/session');
-    });
+    firebase
+      .updateSessionMemberIds(Array.from(selectedMemberIds.current))
+      .then(() => {
+        navigate('/session');
+      });
   }
 
   return (
     <div className={styles.HomePage}>
       <div className={styles.Title}>GMASH</div>
-      {showMembers() &&
+      {showMembers() && (
         <div className={styles.MembersContainer}>
           <Members
             mode={isSelectingMember ? 'select' : 'view'}
-            onSelectedMemberIdsChange={onSelectedMemberIdsChange} />
+            onSelectedMemberIdsChange={onSelectedMemberIdsChange}
+          />
         </div>
-      }
-      {showSignInButton() && <img alt='Sign in' className={styles.GoogleSignIn} src={googleSignIn} onClick={signIn} />}
-      {showRegisterButton() && <button className={styles.Button} onClick={() => register()}>Register</button>}
-      {showStartSessionButton() && <button className={styles.Button} onClick={() => startSession()}>Start Session</button>}
-      {showProceedButton() && <button className={styles.Button} onClick={() => proceed()}>Proceed with {selectedMembersCount} members</button>}
+      )}
+      {showSignInButton() && (
+        <img
+          alt="Sign in"
+          className={styles.GoogleSignIn}
+          src={googleSignIn}
+          onClick={signIn}
+        />
+      )}
+      {showRegisterButton() && (
+        <button className={styles.Button} onClick={() => register()}>
+          Register
+        </button>
+      )}
+      {showStartSessionButton() && (
+        <button className={styles.Button} onClick={() => startSession()}>
+          Start Session
+        </button>
+      )}
+      {showProceedButton() && (
+        <button className={styles.Button} onClick={() => proceed()}>
+          Proceed with {selectedMembersCount} members
+        </button>
+      )}
     </div>
   );
 }
