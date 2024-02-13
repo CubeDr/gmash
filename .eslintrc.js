@@ -41,5 +41,6 @@ module.exports = {
       },
     ],
     'import/no-unresolved': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
   },
 };

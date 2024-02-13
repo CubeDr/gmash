@@ -11,7 +11,7 @@ export default function Court({ game, onClick }: CourtProps) {
   return (
     <div
       className={styles.Court}
-      onClick={(e) => (onClick ? onClick(game) : {})}
+      onClick={() => (onClick ? onClick(game) : {})}
     >
       <div className={styles.CourtContent}>
         <div className={styles.Team}>

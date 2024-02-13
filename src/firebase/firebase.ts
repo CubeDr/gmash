@@ -40,6 +40,7 @@ export default interface Firebase {
 
   addGameResult: (win: GameResultTeam, lose: GameResultTeam) => Promise<void>;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   update: (ref: DatabaseReference, value: any) => Promise<void>;
   delete: (ref: DatabaseReference) => Promise<void>;
 }
