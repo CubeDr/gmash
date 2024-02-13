@@ -1,3 +1,4 @@
+import { Button } from '@mui/material';
 import { useContext, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -33,6 +34,11 @@ export default function HomePage() {
 
   function showProceedButton() {
     return googler?.role === 'organizer' && isSelectingMember;
+  }
+
+  function showViewSessionButton() {
+    // TODO: show this button only if the session exists
+    return googler != null;
   }
 
   function signIn() {
@@ -91,16 +97,41 @@ export default function HomePage() {
           Register
         </button>
       )}
-      {showStartSessionButton() && (
-        <button className={styles.Button} onClick={() => startSession()}>
-          Start Session
-        </button>
-      )}
-      {showProceedButton() && (
-        <button className={styles.Button} onClick={() => proceed()}>
-          Proceed with {selectedMembersCount} members
-        </button>
-      )}
+      <div className={styles.ButtonGroup}>
+        {showViewSessionButton() && (
+          <Button
+            className={styles.Button}
+            variant="outlined"
+            size="large"
+            href="/session"
+          >
+            View Session
+          </Button>
+        )}
+        {showStartSessionButton() && (
+          <Button
+            className={styles.Button}
+            variant="contained"
+            size="large"
+            onClick={() => startSession()}
+          >
+            Start Session
+          </Button>
+        )}
+        {showProceedButton() && (
+          <Button
+            className={styles.Button}
+            variant="contained"
+            size="large"
+            disabled={selectedMembersCount === 0}
+            onClick={() => {
+              proceed();
+            }}
+          >
+            Proceed with {selectedMembersCount} members
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
