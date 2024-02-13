@@ -74,7 +74,7 @@ export default function SessionPage() {
       <h4 className={styles.SectionTitle}>Upcoming</h4>
       <UpcomingGames members={members} />
       <h4 className={styles.SectionTitle}>Recommended</h4>
-      <RecommendedGames />
+      <RecommendedGames members={members} />
       <h4 className={styles.SectionTitle}>Members</h4>
       <div className={styles.Members}>
         {members.map((member) => (
