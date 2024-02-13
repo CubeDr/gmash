@@ -1,3 +1,4 @@
+import { Button } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -82,20 +83,29 @@ export default function SessionPage() {
           />
         ))}
       </div>
-      {selectedMembers.size > 0 && (
-        <button
+      <div className={styles.ButtonGroup}>
+        <Button
           className={styles.Button}
-          onClick={() => setOpenMakeGameDialog(true)}
-          disabled={selectedMembers.size % 2 === 1}
+          variant="contained"
+          onClick={() => {
+            setOpenMakeGameDialog(true);
+          }}
+          disabled={selectedMembers.size < 2 || selectedMembers.size % 2 === 1}
         >
           Make a game ({selectedMembers.size})
-        </button>
-      )}
-      {showSessionCloseButton() && (
-        <button className={styles.Button} onClick={() => closeSession()}>
-          Close Session
-        </button>
-      )}
+        </Button>
+        {showSessionCloseButton() && (
+          <Button
+            variant="outlined"
+            className={styles.Button}
+            onClick={() => {
+              closeSession();
+            }}
+          >
+            Close Session
+          </Button>
+        )}
+      </div>
       <GameDialog
         title="Make a new game"
         open={openMakeGameDialog}
