@@ -10,6 +10,7 @@ import GameDialog from './GameDialog/GameDialog';
 import styles from './SessionPage.module.css';
 import MemberItem from './memberItem/MemberItem';
 import PlayingGames from './playingGames/PlayingGames';
+import RecommendedGames from './recommendedGames/RecommendedGames';
 import UpcomingGames from './upcomingGames/UpcomingGames';
 import useSessionMembers from './useSessionMembers';
 
@@ -72,6 +73,8 @@ export default function SessionPage() {
       <PlayingGames members={members} />
       <h4 className={styles.SectionTitle}>Upcoming</h4>
       <UpcomingGames members={members} />
+      <h4 className={styles.SectionTitle}>Recommended</h4>
+      <RecommendedGames />
       <h4 className={styles.SectionTitle}>Members</h4>
       <div className={styles.Members}>
         {members.map((member) => (
