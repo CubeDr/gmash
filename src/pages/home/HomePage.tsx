@@ -1,5 +1,5 @@
 import { Button } from '@mui/material';
-import { useContext, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Members from '../../components/members/Members';
@@ -13,8 +13,13 @@ export default function HomePage() {
   const { googler, refetch } = useContext(GooglerContext);
   const [isSelectingMember, setIsSelectingMember] = useState(false);
   const [selectedMembersCount, setSelectedMembersCount] = useState(0);
+  const [isSessionOpen, setIsSessionOpen] = useState<boolean | null>(null);
   const selectedMemberIds = useRef(new Set<string>());
   const navigate = useNavigate();
+
+  useEffect(() => {
+    firebase.isSessionOpen().then(isOpen => setIsSessionOpen(isOpen));
+  }, []);
 
   function showMembers() {
     return googler != null;
@@ -29,16 +34,15 @@ export default function HomePage() {
   }
 
   function showStartSessionButton() {
-    return googler?.role === 'organizer' && !isSelectingMember;
+    return googler?.role === 'organizer' && !isSelectingMember && isSessionOpen === false;
   }
 
   function showProceedButton() {
-    return googler?.role === 'organizer' && isSelectingMember;
+    return googler?.role === 'organizer' && isSelectingMember && isSessionOpen === false;
   }
 
   function showViewSessionButton() {
-    // TODO: show this button only if the session exists
-    return googler != null;
+    return googler != null && isSessionOpen;
   }
 
   function signIn() {
