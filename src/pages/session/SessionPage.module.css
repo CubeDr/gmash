@@ -16,20 +16,24 @@
   padding: 8px 0;
 }
 
-.Button {
+.Button, .MakeGameButton {
   background-color: var(--theme-color-4);
   bottom: 0;
   border: none;
   color: var(--theme-color-0);
   padding: 18px;
-  position: fixed;
   width: 100%;
 
   transition: background-color 120ms;
 }
 
-.Button:disabled {
-  background-color: lightgrey;
+.MakeGameButton {
+  position: fixed !important;
+  z-index: 1;
+}
+
+.MakeGameButton:disabled {
+  background-color: lightgray !important;
 }
 
 .ButtonGroup {

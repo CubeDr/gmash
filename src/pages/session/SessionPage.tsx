@@ -86,9 +86,9 @@ export default function SessionPage() {
           />
         ))}
       </div>
-      <div className={styles.ButtonGroup}>
+      {selectedMembers.size > 0 &&
         <Button
-          className={styles.Button}
+          className={styles.MakeGameButton}
           variant="contained"
           onClick={() => {
             setOpenMakeGameDialog(true);
@@ -97,18 +97,18 @@ export default function SessionPage() {
         >
           Make a game ({selectedMembers.size})
         </Button>
-        {showSessionCloseButton() && (
-          <Button
-            variant="outlined"
-            className={styles.Button}
-            onClick={() => {
-              closeSession();
-            }}
-          >
-            Close Session
-          </Button>
-        )}
-      </div>
+      }
+      {showSessionCloseButton() && (
+        <Button
+          variant="outlined"
+          className={styles.Button}
+          onClick={() => {
+            closeSession();
+          }}
+        >
+          Close Session
+        </Button>
+      )}
       <GameDialog
         title="Make a new game"
         open={openMakeGameDialog}
