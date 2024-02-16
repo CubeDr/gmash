@@ -9,6 +9,9 @@
 .Members {
   background-color: var(--theme-color-0);
   border-radius: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 4px;
   margin: 8px;
   padding: 8px 0;
 }
