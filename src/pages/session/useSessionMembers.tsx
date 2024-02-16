@@ -10,12 +10,14 @@ export default function useSelectedMembers() {
 
   useEffect(() => {
     const unsubscribe = firebase.listenToSessionMembers((sessionMemberMap) => {
-      const selected = members
-        .filter((member) => member.id in sessionMemberMap)
-        .map((member) => {
-          const sessionInfo = sessionMemberMap[member.id];
-          return { ...member, ...sessionInfo };
-        });
+      const selected = sessionMemberMap
+        ? members
+            .filter((member) => member.id in sessionMemberMap)
+            .map((member) => {
+              const sessionInfo = sessionMemberMap[member.id];
+              return { ...member, ...sessionInfo };
+            })
+        : [];
 
       setSessionMembers(selected);
     });

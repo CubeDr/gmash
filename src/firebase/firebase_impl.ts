@@ -175,10 +175,12 @@ const firebaseImpl: Firebase = {
   },
 
   async closeSession() {
-    const members = (await get(ref(getDatabase(), 'members'))).val();
+    const members: IDBySessionMember = (
+      await get(ref(getDatabase(), 'members'))
+    ).val();
     await addDoc(collection(getFirestore(), 'session'), {
       id: sessionId,
-      members,
+      members: Object.keys(members),
     });
     await remove(ref(getDatabase(), 'sessionId'));
     await remove(ref(getDatabase(), 'members'));
