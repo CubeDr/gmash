@@ -55,7 +55,7 @@ export default function SessionPage() {
     });
   }
 
-  function showSessionCloseButton() {
+  function showControlSection() {
     return googler?.role === 'organizer';
   }
 
@@ -98,17 +98,20 @@ export default function SessionPage() {
           Make a game ({selectedMembers.size})
         </Button>
       }
-      {showSessionCloseButton() && (
-        <Button
-          variant="outlined"
-          className={styles.Button}
-          onClick={() => {
-            closeSession();
-          }}
-        >
-          Close Session
-        </Button>
-      )}
+      {showControlSection() &&
+        <>
+          <h4 className={styles.SectionTitle}>Control</h4>
+          <Button
+            variant="outlined"
+            className={styles.Button}
+            onClick={() => {
+              closeSession();
+            }}
+          >
+            Close Session
+          </Button>
+        </>
+      }
       <GameDialog
         title="Make a new game"
         open={openMakeGameDialog}
