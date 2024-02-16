@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogTitle } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,6 +21,7 @@ export default function SessionPage() {
     new Set()
   );
   const [openMakeGameDialog, setOpenMakeGameDialog] = useState(false);
+  const [openCloseSessionDialog, setOpenCloseSessionDialog] = useState(false);
   const navigate = useNavigate();
 
   function makeGameFromSelectedMembers() {
@@ -105,7 +106,7 @@ export default function SessionPage() {
             variant="outlined"
             className={styles.Button}
             onClick={() => {
-              closeSession();
+              setOpenCloseSessionDialog(true);
             }}
           >
             Close Session
@@ -123,6 +124,19 @@ export default function SessionPage() {
         }}
         game={makeGameFromSelectedMembers()}
       />
+      <Dialog
+        open={openCloseSessionDialog}
+        onClose={() => setOpenCloseSessionDialog(false)}>
+        <DialogTitle>
+          {"Close ongoing session?"}
+        </DialogTitle>
+        <DialogActions>
+          <Button onClick={() => setOpenCloseSessionDialog(false)}>Cancel</Button>
+          <Button onClick={() => closeSession()} autoFocus>
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
