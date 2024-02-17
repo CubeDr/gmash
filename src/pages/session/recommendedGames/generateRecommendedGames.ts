@@ -6,12 +6,15 @@ interface ScoredGame {
   score: number;
 }
 
-function getGameCount(member: Member) {
-  return (member.played ?? 0) + (member.upcoming ?? 0);
+function getGameCount(member: Member, playingMemberIds: Set<string>) {
+  const played = member.played ?? 0;
+  const upcoming = member.upcoming ?? 0;
+  const playing = playingMemberIds.has(member.id) ? 1 : 0;
+  return played + upcoming + playing;
 }
 
-function getMaxGameCount(members: Member[]) {
-  return Math.max(...members.map(getGameCount));
+function getMaxGameCount(members: Member[], playingMemberIds: Set<string>) {
+  return Math.max(...members.map(member => getGameCount(member, playingMemberIds)));
 }
 
 function generateAllPossiblePlayers(members: Member[]): Member[][] {
@@ -62,7 +65,7 @@ function getTeamEloDiff(game: Game) {
 
 function getInsufficientGames(game: Game, maxPlayedCount: number) {
   return [...game.team1, ...game.team2]
-    .map((member) => maxPlayedCount - getGameCount(member))
+    .map(member => maxPlayedCount - getGameCount(member))
     .reduce((a, b) => a + b, 0);
 }
 
@@ -79,8 +82,8 @@ export default function generateRecommendedGames(members: Member[]): Game[] {
   const maxPlayedCount = getMaxGameCount(members);
   const games = generateAllPossibleGames(members);
   return games
-    .map((game) => scoreGame(game, maxPlayedCount))
+    .map(game => scoreGame(game, maxPlayedCount))
     .sort((a, b) => b.score - a.score)
     .slice(0, 10)
-    .map((scoredGame) => scoredGame.game);
+    .map(scoredGame => scoredGame.game);
 }
