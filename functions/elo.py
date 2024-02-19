@@ -3,20 +3,20 @@ from typing import TypedDict
 import constants as c
 
 
-UpdatedElos = TypedDict(
-    "UpdatedElos",
-    dict(team_a_elo=list[int], team_b_elo=list[int]),
+EloDiffs = TypedDict(
+    "EloDiffs",
+    dict(team_a_elo_diffs=list[int], team_b_elo_diffs=list[int]),
 )
 
 
-def calculate_updated_elos_for_singles(
+def calculate_elo_diffs_for_singles(
     team_a_elo: int,
     team_b_elo: int,
     team_a_score: int,
     team_b_score: int,
-) -> UpdatedElos:
+) -> EloDiffs:
     if team_a_score > team_b_score:
-        updated_elos = calculate_updated_elos_for_singles(
+        updated_elos = calculate_elo_diffs_for_singles(
             team_b_elo, team_a_elo, team_b_score, team_a_score
         )
         return {
@@ -25,21 +25,23 @@ def calculate_updated_elos_for_singles(
         }
     x, y = team_a_elo, team_b_elo
     delta = (team_b_score - team_a_score) / team_b_score / c.T_SCORE
-    x_ = (x * (2 - c.T_ELO) + y * c.T_ELO - delta * c.T_ELO) / 2
-    y_ = (x * c.T_ELO + y * (2 - c.T_ELO) + delta * c.T_ELO) / 2
-    return {"team_a_elo": [x_], "team_b_elo": [y_]}
+
+    dx = c.T_ELO * (-x + y - delta) / 2
+    dy = c.T_ELO * (x - y + delta) / 2
+    dx, dy = round(dx), round(dy)
+    return {"team_a_elo_diffs": [dx], "team_b_elo_diffs": [dy]}
 
 
-def calculate_updated_elos_for_doubles(
+def calculate_elo_diffs_for_doubles(
     team_a_elo: list[int],
     team_b_elo: list[int],
     team_a_score: int,
     team_b_score: int,
-) -> UpdatedElos:
+) -> EloDiffs:
     assert len(team_a_elo) == 2
     assert len(team_b_elo) == 2
     if team_a_score > team_b_score:
-        updated_elos = calculate_updated_elos_for_doubles(
+        updated_elos = calculate_elo_diffs_for_doubles(
             team_b_elo, team_a_elo, team_b_score, team_a_score
         )
         return {
@@ -58,14 +60,14 @@ def calculate_updated_elos_for_doubles(
     delta = (team_b_score - team_a_score) / team_b_score / c.T_SCORE
     x, y = c.P_ELO * x_1 + c.Q_ELO * x_2, c.P_ELO * y_1 + c.Q_ELO * y_2
 
-    x_1_ = x_1 + c.T_ELO * (-delta - x + y) / divider
-    x_2_ = x_2 + c.T_ELO * (-c.C_ELO * delta - x + y) / divider
-    y_1_ = y_1 + c.T_ELO * (delta + x - y) / divider
-    y_2_ = y_2 + c.T_ELO * (c.C_ELO * delta + x - y) / divider
+    dx_1 = c.T_ELO * (-delta - x + y) / divider
+    dx_2 = c.T_ELO * (-c.C_ELO * delta - x + y) / divider
+    dy_1 = c.T_ELO * (delta + x - y) / divider
+    dy_2 = c.T_ELO * (c.C_ELO * delta + x - y) / divider
 
     if x_swapped:
-        x_1_, x_2_ = x_2_, x_1_
+        dx_1, dx_2 = dx_2, dx_1
     if y_swapped:
-        y_1_, y_2_ = y_2_, y_1_
-    x_1_, x_2_, y_1_, y_2_ = map(round, [x_1_, x_2_, y_1_, y_2_])
-    return {"team_a_elo": [x_1_, x_2_], "team_b_elo": [y_1_, y_2_]}
+        dy_1, dy_2 = dy_2, dy_1
+    dx_1, dx_2, dy_1, dy_2 = map(round, [dx_1, dx_2, dy_1, dy_2])
+    return {"team_a_elo_diffs": [dx_1, dx_2], "team_b_elo_diffs": [dy_1, dy_2]}

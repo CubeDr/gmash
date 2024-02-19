@@ -2,98 +2,60 @@ import collections
 from firebase_functions import https_fn
 from firebase_admin import db, firestore
 import flask
+import time
+import traceback
 
 
 from api import common
 import constants as c
+import datatypes as d
 
 
 debug_bp = flask.Blueprint("debug", __name__)
 
+
 _NAMES = ["Hyuni", "Seayeon", "Woosung", "Jiwoo"]
 
 
-@debug_bp.patch("/update_all_game_records")
-def update_all_game_records() -> https_fn.Response:
-    """Update all game records in minimal transactions, intended to be a one-time job."""
+@debug_bp.patch("/start_session")
+def start_session() -> https_fn.Response:
+    """Start a session."""
+    if (session_id := common.get_current_session_id()) is not None:
+        return https_fn.Response(f"Session {session_id} already in run")
     store = firestore.client()
-    try:
-        googlers = store.collection(c.GOOGLERS).get()
-        members = [
-            common.Googler.from_json(member.to_dict(), member.id) for member in googlers
-        ]
-        id_to_member = {member.id: member for member in members}
-        for member in members:
-            member.elo = c.DEFAULT_ELO
-
-        num_played = collections.defaultdict(int)
-        num_wins = collections.defaultdict(int)
-        game_result = store.collection(c.GAME_RESULT).get()
-
-        for doc in game_result:
-            game = common.GameResult.from_json(doc.to_dict())
-            for player_id in game.win.playersId:
-                num_played[player_id] += 1
-                num_wins[player_id] += 1
-            for player_id in game.lose.playersId:
-                num_played[player_id] += 1
-            for id, updated_elo in common.compute_elo(
-                winners=[id_to_member[id] for id in game.win.playersId],
-                losers=[id_to_member[id] for id in game.lose.playersId],
-                win_score=game.win.score,
-                lose_score=game.lose.score,
-            ).items():
-                id_to_member[id].elo = updated_elo
-
-        for doc in googlers:
-            doc.reference.update({c.ELO: id_to_member[doc.id].elo})
-    except Exception as e:
-        return https_fn.Response(f"Failed to update_game_record_entirely {e}")
-    return https_fn.Response("Updated game records entirely")
+    all_googlers = common.get_all_registered_googlers()
+    db.reference(c.MEMBERS).update(
+        {
+            googler.id: {
+                c.PLAYED: 0,
+                c.UPCOMING: 0,
+            }
+            for googler in all_googlers
+        }
+    )
+    new_session_id = str(int(time.time()))
+    db.reference("/").update({c.SESSION_ID: new_session_id})
+    return https_fn.Response(f"Started a session {new_session_id}")
 
 
-@debug_bp.patch("/make_fake_db")
-def make_fake_db() -> https_fn.Response:
-    """Make fake Firestore DB."""
+@debug_bp.patch("/end_session")
+def end_session() -> https_fn.Response:
+    """End a session and store the result to "sessions" storage."""
     store = firestore.client()
-    try:
-        ids = []
-        googlers = store.collection(c.GOOGLERS)
-        common.delete_all_documents_of_collection(googlers)
-        for i in range(4):
-            _, doc_ref = googlers.add({c.NAME: _NAMES[i]})
-            ids.append(doc_ref.id)
-
-        games = store.collection(c.GAME_RESULT)
-        common.delete_all_documents_of_collection(games)
-
-        db.reference(c.UPCOMING).delete()
-        db.reference(c.MEMBERS).delete()
-        db.reference(c.MEMBERS).update(
-            {id: {c.ID: id, c.PLAYED: 0, c.UPCOMING: 0} for id in ids}
-        )
-        db.reference(c.UPCOMING).update(
-            {
-                0: {c.TEAM1: [ids[0], ids[1]], c.TEAM2: [ids[2], ids[3]]},
-                1: {c.TEAM1: [ids[1], ids[2]], c.TEAM2: [ids[0], ids[3]]},
-            },
-        )
-
-        games.add(
-            {
-                c.WIN: {c.PLAYERS_ID: [ids[0], ids[1]], c.SCORE: 21},
-                c.LOSE: {c.PLAYERS_ID: [ids[2], ids[3]], c.SCORE: 15},
-            }
-        )
-        games.add(
-            {
-                c.WIN: {c.PLAYERS_ID: [ids[0], ids[2]], c.SCORE: 21},
-                c.LOSE: {c.PLAYERS_ID: [ids[1], ids[3]], c.SCORE: 17},
-            }
-        )
-    except Exception as e:
-        return https_fn.Response(f"Failed to make_fake_db {e}")
-    return https_fn.Response("Made a fake db")
+    session_id = common.get_current_session_id()
+    if session_id is None:
+        return https_fn.Response(f"Session not in run")
+    members = db.reference(c.MEMBERS).get()
+    store.collection(c.SESSION).add(
+        {
+            c.ID: session_id,
+            c.MEMBERS: members,
+        }
+    )
+    db.reference("/").update({c.SESSION_ID: None})
+    db.reference(c.UPCOMING).delete()
+    db.reference(c.MEMBERS).delete()
+    return https_fn.Response(f"Ended a session {session_id}")
 
 
 @debug_bp.post("/add_game_result_with_names")
@@ -114,10 +76,14 @@ def add_game_result_with_names() -> https_fn.Response:
     """
     store = firestore.client()
     request = flask.request.get_json()
+    session_id = common.get_current_session_id()
+    if session_id is None:
+        return https_fn.Response(f"Session is not running")
     try:
         game_result = {
             c.WIN: {c.PLAYERS_ID: [], c.SCORE: 0},
             c.LOSE: {c.PLAYERS_ID: [], c.SCORE: 0},
+            c.SESSION_ID: session_id,
         }
         for name in request.get("win", {}).get("players", []):
             player = store.collection(c.GOOGLERS).where(c.NAME, "==", name).get()
@@ -137,3 +103,83 @@ def add_game_result_with_names() -> https_fn.Response:
     except Exception as e:
         return https_fn.Response(f"Failed to add_game_result {e}")
     return https_fn.Response("Added a game result successfully")
+
+
+@debug_bp.patch("/make_fake_db")
+def make_fake_db() -> https_fn.Response:
+    """Make fake Firestore DB."""
+    store = firestore.client()
+    try:
+        ids = []
+        googlers = store.collection(c.GOOGLERS)
+        common.delete_all_documents_of_collection(googlers)
+        for i in range(4):
+            _, doc_ref = googlers.add(
+                {
+                    c.NAME: _NAMES[i],
+                    c.ELO: c.DEFAULT_ELO,
+                }
+            )
+            ids.append(doc_ref.id)
+
+        games = store.collection(c.GAME_RESULT)
+        sessions = store.collection(c.SESSION)
+        common.delete_all_documents_of_collection(games)
+        common.delete_all_documents_of_collection(sessions)
+
+        db.reference(c.UPCOMING).delete()
+        db.reference(c.MEMBERS).delete()
+        db.reference(c.MEMBERS).update(
+            {
+                id: {
+                    c.PLAYED: 0,
+                    c.UPCOMING: 0,
+                }
+                for id in ids
+            }
+        )
+        db.reference(c.UPCOMING).update(
+            {
+                0: {c.TEAM1: [ids[0], ids[1]], c.TEAM2: [ids[2], ids[3]]},
+                1: {c.TEAM1: [ids[1], ids[2]], c.TEAM2: [ids[0], ids[3]]},
+            },
+        )
+        db.reference("/").update({c.SESSION_ID: "1"})
+
+        games.add(
+            {
+                c.WIN: {c.PLAYERS_ID: [ids[0], ids[1]], c.SCORE: 21},
+                c.LOSE: {c.PLAYERS_ID: [ids[2], ids[3]], c.SCORE: 10},
+                c.SESSION_ID: "0",
+            }
+        )
+        games.add(
+            {
+                c.WIN: {c.PLAYERS_ID: [ids[0], ids[2]], c.SCORE: 21},
+                c.LOSE: {c.PLAYERS_ID: [ids[1], ids[3]], c.SCORE: 5},
+                c.SESSION_ID: "0",
+            }
+        )
+        sessions.add(
+            {
+                c.ID: "0",
+                c.MEMBERS: ids,
+            }
+        )
+        games.add(
+            {
+                c.WIN: {c.PLAYERS_ID: [ids[0], ids[1]], c.SCORE: 21},
+                c.LOSE: {c.PLAYERS_ID: [ids[2], ids[3]], c.SCORE: 15},
+                c.SESSION_ID: "1",
+            }
+        )
+        games.add(
+            {
+                c.WIN: {c.PLAYERS_ID: [ids[0], ids[2]], c.SCORE: 21},
+                c.LOSE: {c.PLAYERS_ID: [ids[1], ids[3]], c.SCORE: 17},
+                c.SESSION_ID: "1",
+            }
+        )
+    except Exception as e:
+        return https_fn.Response(f"Failed to make_fake_db {e}, {traceback.print_exc()}")
+    return https_fn.Response("Made a fake db")
