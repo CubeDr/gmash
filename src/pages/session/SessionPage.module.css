@@ -42,3 +42,12 @@
   justify-content: space-between;
   padding: 10px;
 }
+
+.MembersTab {
+  display: flex;
+  justify-content: space-between;
+}
+
+.EditMembersButton {
+  padding-right: 10px;
+}

@@ -1,6 +1,6 @@
 import { Button } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import Members from '../../components/members/Members';
 import firebase from '../../firebase';
@@ -9,7 +9,10 @@ import { GooglerContext } from '../../providers/GooglerContext';
 import styles from './HomePage.module.css';
 import googleSignIn from './google_signin.png';
 
+const EDIT_SESSION_QUERY_PARAM = 'edit_session';
+
 export default function HomePage() {
+  const queryParams = new URLSearchParams(useLocation().search);
   const { googler, refetch } = useContext(GooglerContext);
   const [isSelectingMember, setIsSelectingMember] = useState(false);
   const [isSessionOpen, setIsSessionOpen] = useState<boolean | null>(null);
@@ -26,6 +29,12 @@ export default function HomePage() {
     if (isSessionOpen) {
       firebase.getSessionMembers().then((members) => {
         setSelectedMemberIds(new Set(members));
+        if (
+          googler?.role === 'organizer' &&
+          queryParams.get(EDIT_SESSION_QUERY_PARAM) === 'true'
+        ) {
+          setIsSelectingMember(true);
+        }
       });
     }
   }, [isSessionOpen]);
@@ -146,7 +155,9 @@ export default function HomePage() {
             className={styles.Button}
             variant="contained"
             size="large"
-            onClick={() => startSession()}
+            onClick={() => {
+              startSession();
+            }}
           >
             Start Session
           </Button>
