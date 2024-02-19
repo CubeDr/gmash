@@ -1,4 +1,4 @@
-import { useContext, useRef } from 'react';
+import { useContext } from 'react';
 
 import { MembersContext } from '../../providers/MembersContext';
 
@@ -6,15 +6,16 @@ import styles from './Members.module.css';
 
 interface MembersProps {
   mode: 'view' | 'select';
-  onSelectedMemberIdsChange?: (selectedMemberIds: Set<string>) => void;
+  onSelectedMemberIdsChange: (memberId: string) => void;
+  selectedMemberIds: Set<string>;
 }
 
 export default function Members({
   mode,
   onSelectedMemberIdsChange,
+  selectedMemberIds,
 }: MembersProps) {
   const { members } = useContext(MembersContext);
-  const selectedMemberIds = useRef(new Set<string>());
 
   return (
     <div className={styles.Members}>
@@ -29,16 +30,9 @@ export default function Members({
                 type="checkbox"
                 id={member.id}
                 className={styles.Checkbox}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    selectedMemberIds.current.add(member.id);
-                  } else {
-                    selectedMemberIds.current.delete(member.id);
-                  }
-
-                  if (onSelectedMemberIdsChange) {
-                    onSelectedMemberIdsChange(selectedMemberIds.current);
-                  }
+                defaultChecked={selectedMemberIds.has(member.id)}
+                onChange={() => {
+                  onSelectedMemberIdsChange(member.id);
                 }}
               />
             )}
