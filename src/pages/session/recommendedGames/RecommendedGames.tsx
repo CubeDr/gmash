@@ -7,23 +7,23 @@ import GameRow from '../gameRow/GameRow';
 import generateRecommendedGames from './generateRecommendedGames';
 
 interface RecommendedGamesProps {
-    members: Member[];
+  members: Member[];
 }
 
 export default function RecommendedGames({ members }: RecommendedGamesProps) {
-    const [recommendedGames, setRecommendedGames] = useState<Game[]>([]);
+  const [recommendedGames, setRecommendedGames] = useState<Game[]>([]);
 
-    useEffect(() => {
-        setRecommendedGames(generateRecommendedGames(members));
-    }, [members]);
+  useEffect(() => {
+    setRecommendedGames(generateRecommendedGames(members));
+  }, [members]);
 
-    return (
-        <GameRow
-            games={recommendedGames}
-            dialog={{
-                title: 'Recommended game',
-                actions: [],
-            }}
-        />
-    );
+  return (
+    <GameRow
+      games={recommendedGames}
+      dialog={{
+        title: 'Recommended game',
+        actions: [],
+      }}
+    />
+  );
 }
