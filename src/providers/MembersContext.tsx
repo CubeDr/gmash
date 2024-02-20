@@ -37,17 +37,8 @@ export function MembersContextProvider({
   const [isLoaded, setIsLoaded] = useState(false);
 
   const getMemberById = useCallback((id: string) => {
-    setIsLoaded(true);
     return idToMemberMap.get(id);
   }, [idToMemberMap]);
-
-  useEffect(() => {
-    const map = new Map<string, Member>();
-    for (const member of members) {
-      map.set(member.id, member);
-    }
-    setIdToMemberMap(map);
-  }, [members]);
 
   useEffect(() => {
     if (googler == null) {
@@ -57,6 +48,14 @@ export function MembersContextProvider({
 
     firebase.getAllMembers().then((members) => {
       setMembers(members);
+
+      const map = new Map<string, Member>();
+      for (const member of members) {
+        map.set(member.id, member);
+      }
+      setIdToMemberMap(map);
+
+      setIsLoaded(true);
     });
   }, [googler]);
 
