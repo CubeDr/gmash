@@ -19,6 +19,7 @@ export default function HomePage() {
   const [selectedMemberIds, setSelectedMemberIds] = useState<Set<string>>(
     new Set()
   );
+  const [showElo, setShowElo] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,6 +52,10 @@ export default function HomePage() {
 
   function showRegisterButton() {
     return googler != null && googler.name == null;
+  }
+
+  function showEloToggle() {
+    return googler?.role === 'organizer';
   }
 
   function showStartSessionButton() {
@@ -117,12 +122,17 @@ export default function HomePage() {
   return (
     <div className={styles.HomePage}>
       <div className={styles.Title}>GMASH</div>
+      {showEloToggle() && (
+        <div className={styles.EloToggle + (showElo ? ' ' + styles.EloToggleOff : '')}
+          onClick={() => setShowElo(showElo => !showElo)}>Toggle Elo</div>
+      )}
       {showMembers() && (
         <div className={styles.MembersContainer}>
           <Members
             mode={isSelectingMember ? 'select' : 'view'}
             onSelectedMemberIdsChange={onSelectedMemberIdsChange}
             selectedMemberIds={selectedMemberIds}
+            showElo={showElo}
           />
         </div>
       )}

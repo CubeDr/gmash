@@ -8,12 +8,14 @@ interface MembersProps {
   mode: 'view' | 'select';
   onSelectedMemberIdsChange: (memberId: string) => void;
   selectedMemberIds: Set<string>;
+  showElo: boolean;
 }
 
 export default function Members({
   mode,
   onSelectedMemberIdsChange,
   selectedMemberIds,
+  showElo,
 }: MembersProps) {
   const { members } = useContext(MembersContext);
 
@@ -37,7 +39,7 @@ export default function Members({
               />
             )}
             <label className={styles.Label} htmlFor={member.id}>
-              {member.name}
+              {member.name + (showElo ? ' (' + member.elo + ')' : '')}
             </label>
           </li>
         ))}

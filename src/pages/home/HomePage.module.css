@@ -20,6 +20,20 @@
   text-align: center;
 }
 
+.EloToggle {
+  background: white;
+  border-radius: 30px;
+  position: absolute;
+  padding: 8px 14px;
+  right: 14px;
+  top: 48px;
+}
+
+.EloToggleOff {
+  background: var(--theme-color-5);
+  color: white;
+}
+
 .MembersContainer {
   flex-grow: 1;
   overflow-y: scroll;
