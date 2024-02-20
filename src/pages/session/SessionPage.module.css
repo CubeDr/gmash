@@ -16,7 +16,8 @@
   padding: 8px 0;
 }
 
-.Button, .MakeGameButton {
+.Button,
+.MakeGameButton {
   background-color: var(--theme-color-4);
   bottom: 0;
   border: none;
@@ -41,4 +42,13 @@
   flex-direction: row;
   justify-content: space-between;
   padding: 10px;
+}
+
+.MembersTab {
+  display: flex;
+  justify-content: space-between;
+}
+
+.EditMembersButton {
+  padding-right: 10px;
 }

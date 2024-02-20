@@ -1,6 +1,6 @@
 import { Button } from '@mui/material';
-import { useContext, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import Members from '../../components/members/Members';
 import firebase from '../../firebase';
@@ -9,17 +9,35 @@ import { GooglerContext } from '../../providers/GooglerContext';
 import styles from './HomePage.module.css';
 import googleSignIn from './google_signin.png';
 
+const EDIT_SESSION_QUERY_PARAM = 'edit_session';
+
 export default function HomePage() {
+  const queryParams = new URLSearchParams(useLocation().search);
   const { googler, refetch } = useContext(GooglerContext);
   const [isSelectingMember, setIsSelectingMember] = useState(false);
-  const [selectedMembersCount, setSelectedMembersCount] = useState(0);
   const [isSessionOpen, setIsSessionOpen] = useState<boolean | null>(null);
-  const selectedMemberIds = useRef(new Set<string>());
+  const [selectedMemberIds, setSelectedMemberIds] = useState<Set<string>>(
+    new Set()
+  );
   const navigate = useNavigate();
 
   useEffect(() => {
-    firebase.isSessionOpen().then(isOpen => setIsSessionOpen(isOpen));
+    firebase.isSessionOpen().then((isOpen) => setIsSessionOpen(isOpen));
   }, []);
+
+  useEffect(() => {
+    if (isSessionOpen) {
+      firebase.getSessionMembers().then((members) => {
+        setSelectedMemberIds(new Set(members));
+        if (
+          googler?.role === 'organizer' &&
+          queryParams.get(EDIT_SESSION_QUERY_PARAM) === 'true'
+        ) {
+          setIsSelectingMember(true);
+        }
+      });
+    }
+  }, [isSessionOpen]);
 
   function showMembers() {
     return googler != null;
@@ -34,15 +52,23 @@ export default function HomePage() {
   }
 
   function showStartSessionButton() {
-    return googler?.role === 'organizer' && !isSelectingMember && isSessionOpen === false;
+    return (
+      googler?.role === 'organizer' &&
+      !isSelectingMember &&
+      isSessionOpen === false
+    );
   }
 
   function showProceedButton() {
-    return googler?.role === 'organizer' && isSelectingMember && isSessionOpen === false;
+    return googler?.role === 'organizer' && isSelectingMember;
   }
 
   function showViewSessionButton() {
     return googler != null && isSessionOpen;
+  }
+
+  function showEditSessionButton() {
+    return googler?.role === 'organizer' && isSessionOpen && !isSelectingMember;
   }
 
   function signIn() {
@@ -64,17 +90,26 @@ export default function HomePage() {
     setIsSelectingMember(true);
   }
 
-  function onSelectedMemberIdsChange(newSelectedMemberIds: Set<string>) {
-    selectedMemberIds.current = newSelectedMemberIds;
-    setSelectedMembersCount(newSelectedMemberIds.size);
+  function editSession() {
+    setIsSelectingMember(true);
+  }
+
+  function onSelectedMemberIdsChange(memberId: string) {
+    setSelectedMemberIds((prev) => {
+      const ids = new Set(prev);
+      if (ids.has(memberId)) {
+        ids.delete(memberId);
+      } else {
+        ids.add(memberId);
+      }
+      return ids;
+    });
   }
 
   function proceed() {
-    firebase
-      .updateSessionMembers(Array.from(selectedMemberIds.current))
-      .then(() => {
-        navigate('/session');
-      });
+    firebase.updateSessionMembers(Array.from(selectedMemberIds)).then(() => {
+      navigate('/session');
+    });
   }
 
   return (
@@ -85,6 +120,7 @@ export default function HomePage() {
           <Members
             mode={isSelectingMember ? 'select' : 'view'}
             onSelectedMemberIdsChange={onSelectedMemberIdsChange}
+            selectedMemberIds={selectedMemberIds}
           />
         </div>
       )}
@@ -107,7 +143,9 @@ export default function HomePage() {
             className={styles.Button}
             variant="outlined"
             size="large"
-            href="/gmash/session"
+            onClick={() => {
+              navigate('/session');
+            }}
           >
             View Session
           </Button>
@@ -117,9 +155,23 @@ export default function HomePage() {
             className={styles.Button}
             variant="contained"
             size="large"
-            onClick={() => startSession()}
+            onClick={() => {
+              startSession();
+            }}
           >
             Start Session
+          </Button>
+        )}
+        {showEditSessionButton() && (
+          <Button
+            className={styles.Button}
+            variant="contained"
+            size="large"
+            onClick={() => {
+              editSession();
+            }}
+          >
+            Edit Session
           </Button>
         )}
         {showProceedButton() && (
@@ -127,12 +179,12 @@ export default function HomePage() {
             className={styles.Button}
             variant="contained"
             size="large"
-            disabled={selectedMembersCount === 0}
+            disabled={selectedMemberIds.size === 0}
             onClick={() => {
               proceed();
             }}
           >
-            Proceed with {selectedMembersCount} members
+            Proceed with {selectedMemberIds.size} members
           </Button>
         )}
       </div>

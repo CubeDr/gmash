@@ -60,6 +60,10 @@ export default function SessionPage() {
     return googler?.role === 'organizer';
   }
 
+  function showSessionEditButton() {
+    return googler?.role === 'organizer';
+  }
+
   useEffect(() => {
     firebase.isSessionOpen().then((isOpen) => {
       if (!isOpen) {
@@ -76,7 +80,21 @@ export default function SessionPage() {
       <UpcomingGames members={members} />
       <h4 className={styles.SectionTitle}>Recommended</h4>
       <RecommendedGames members={members} />
-      <h4 className={styles.SectionTitle}>Members</h4>
+      <div className={styles.MembersTab}>
+        <h4 className={styles.SectionTitle}>Members</h4>
+        {showSessionEditButton() && (
+          <Button
+            variant="text"
+            size="small"
+            className={styles.EditMembersButton}
+            onClick={() => {
+              navigate('/?edit_session=true');
+            }}
+          >
+            Edit members
+          </Button>
+        )}
+      </div>
       <div className={styles.Members}>
         {members.map((member) => (
           <MemberItem
@@ -87,7 +105,7 @@ export default function SessionPage() {
           />
         ))}
       </div>
-      {selectedMembers.size > 0 &&
+      {selectedMembers.size > 0 && (
         <Button
           className={styles.MakeGameButton}
           variant="contained"
@@ -98,8 +116,8 @@ export default function SessionPage() {
         >
           Make a game ({selectedMembers.size})
         </Button>
-      }
-      {showControlSection() &&
+      )}
+      {showControlSection() && (
         <>
           <h4 className={styles.SectionTitle}>Control</h4>
           <Button
@@ -112,7 +130,7 @@ export default function SessionPage() {
             Close Session
           </Button>
         </>
-      }
+      )}
       <GameDialog
         title="Make a new game"
         open={openMakeGameDialog}
@@ -126,12 +144,13 @@ export default function SessionPage() {
       />
       <Dialog
         open={openCloseSessionDialog}
-        onClose={() => setOpenCloseSessionDialog(false)}>
-        <DialogTitle>
-          {"Close ongoing session?"}
-        </DialogTitle>
+        onClose={() => setOpenCloseSessionDialog(false)}
+      >
+        <DialogTitle>{'Close ongoing session?'}</DialogTitle>
         <DialogActions>
-          <Button onClick={() => setOpenCloseSessionDialog(false)}>Cancel</Button>
+          <Button onClick={() => setOpenCloseSessionDialog(false)}>
+            Cancel
+          </Button>
           <Button onClick={() => closeSession()} autoFocus>
             OK
           </Button>

@@ -18,6 +18,7 @@ export default interface Firebase {
   getAllMembers: () => Promise<Member[]>;
   getMembersById: (ids: string[]) => Promise<Member[]>;
 
+  getSessionMembers: () => Promise<string[]>;
   updateSessionMembers: (ids: string[]) => Promise<void>;
   listenToSessionMembers: (
     listener: (sessionMembers: IDBySessionMember) => void

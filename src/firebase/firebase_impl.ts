@@ -137,8 +137,14 @@ const firebaseImpl: Firebase = {
   async updateSessionMembers(ids: string[]) {
     const sessionMembers: IDBySessionMember = {};
 
+    const existingMembers = (await get(ref(getDatabase(), 'members'))).val();
+
     ids.forEach((id) => {
-      sessionMembers[id] = { played: 0, upcoming: 0 };
+      if (id in existingMembers) {
+        sessionMembers[id] = existingMembers[id];
+      } else {
+        sessionMembers[id] = { played: 0, upcoming: 0 };
+      }
     });
 
     console.log(sessionMembers);
@@ -148,6 +154,14 @@ const firebaseImpl: Firebase = {
     } catch (e) {
       console.error(e);
     }
+  },
+
+  async getSessionMembers() {
+    const members: IDBySessionMember = (
+      await get(ref(getDatabase(), 'members'))
+    ).val();
+
+    return Object.keys(members);
   },
 
   listenToSessionMembers(
