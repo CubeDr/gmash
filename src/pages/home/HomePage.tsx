@@ -22,7 +22,9 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    firebase.isSessionOpen().then((isOpen) => setIsSessionOpen(isOpen));
+    firebase.isSessionOpen().then((isOpen) => {
+      setIsSessionOpen(isOpen);
+    });
   }, []);
 
   useEffect(() => {
