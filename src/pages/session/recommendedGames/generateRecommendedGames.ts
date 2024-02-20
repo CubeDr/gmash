@@ -73,15 +73,15 @@ function scoreGame(game: Game, maxPlayedCount: number, playingMemberIds: Set<str
   const eloDiff = getTeamEloDiff(game);
   const insufficientGames = getInsufficientGames(game, maxPlayedCount, playingMemberIds);
 
-  const score = eloDiff * -1 + insufficientGames * -350;
+  const score = eloDiff * -1 + insufficientGames * 350;
 
   return { game, score };
 }
 
 export default function generateRecommendedGames(members: Member[], playingMemberIds: Set<string>): Game[] {
   const maxPlayedCount = getMaxGameCount(members, playingMemberIds);
-  const games = generateAllPossibleGames(members);
-  return games
+
+  return generateAllPossibleGames(members)
     .map(game => scoreGame(game, maxPlayedCount, playingMemberIds))
     .sort((a, b) => b.score - a.score)
     .slice(0, 10)
