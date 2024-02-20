@@ -137,7 +137,8 @@ const firebaseImpl: Firebase = {
   async updateSessionMembers(ids: string[]) {
     const sessionMembers: IDBySessionMember = {};
 
-    const existingMembers = (await get(ref(getDatabase(), 'members'))).val();
+    const existingMembers =
+      (await get(ref(getDatabase(), 'members'))).val() ?? {};
 
     ids.forEach((id) => {
       if (id in existingMembers) {
@@ -157,9 +158,8 @@ const firebaseImpl: Firebase = {
   },
 
   async getSessionMembers() {
-    const members: IDBySessionMember = (
-      await get(ref(getDatabase(), 'members'))
-    ).val();
+    const members: IDBySessionMember =
+      (await get(ref(getDatabase(), 'members'))).val() ?? {};
 
     return Object.keys(members);
   },
