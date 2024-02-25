@@ -2,15 +2,12 @@ import {
   ReactNode,
   createContext,
   useCallback,
-  useContext,
   useEffect,
   useState,
 } from 'react';
 
 import Member from '../data/member';
 import firebase from '../firebase';
-
-import { GooglerContext } from './GooglerContext';
 
 interface MembersContextProviderProps {
   children: ReactNode;
@@ -31,7 +28,6 @@ export const MembersContext = createContext({
 export function MembersContextProvider({
   children,
 }: MembersContextProviderProps) {
-  const { googler } = useContext(GooglerContext);
   const [members, setMembers] = useState<Member[]>([]);
   const [idToMemberMap, setIdToMemberMap] = useState<Map<string, Member>>(new Map());
   const [isLoaded, setIsLoaded] = useState(false);
@@ -41,11 +37,6 @@ export function MembersContextProvider({
   }, [idToMemberMap]);
 
   useEffect(() => {
-    if (googler == null) {
-      setMembers([]);
-      return;
-    }
-
     firebase.getAllMembers().then((members) => {
       setMembers(members);
 
@@ -57,7 +48,7 @@ export function MembersContextProvider({
 
       setIsLoaded(true);
     });
-  }, [googler]);
+  }, []);
 
   return (
     <MembersContext.Provider value={{ isLoaded, members, getMemberById }}>

@@ -1,7 +1,8 @@
-import { useContext, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Game from '../../../data/game';
-import { GooglerContext } from '../../../providers/GooglerContext';
+import { Googler } from '../../../data/googler';
+import googlerService from '../../../services/googlerService';
 import GameDialog, { GameDialogAction } from '../GameDialog/GameDialog';
 import Court from '../court/Court';
 
@@ -16,7 +17,7 @@ interface GameRowProps {
 }
 
 export default function GameRow({ games, dialog }: GameRowProps) {
-  const { googler } = useContext(GooglerContext);
+  const [googler, setGoogler] = useState<Googler | null>(null);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
 
   function onGameClick(game: Game) {
@@ -25,6 +26,10 @@ export default function GameRow({ games, dialog }: GameRowProps) {
     }
     setSelectedGame(game);
   }
+
+  useEffect(() => {
+    googlerService.googlerStream.on(googler => setGoogler(googler));
+  }, []);
 
   return (
     <div className={styles.GameRow}>
