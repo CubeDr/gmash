@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import Members from '../../components/members/Members';
-import { Googler } from '../../data/googler';
 import firebase from '../../firebase';
 import googlerService from '../../services/googlerService';
+import useStream from '../../useStream';
 
 import styles from './HomePage.module.css';
 import googleSignIn from './google_signin.png';
@@ -14,7 +14,7 @@ const EDIT_SESSION_QUERY_PARAM = 'edit_session';
 
 export default function HomePage() {
   const queryParams = new URLSearchParams(useLocation().search);
-  const [googler, setGoogler] = useState<Googler | null>(null);
+  const googler = useStream(googlerService.googlerStream);
   const [isSelectingMember, setIsSelectingMember] = useState(false);
   const [isSessionOpen, setIsSessionOpen] = useState<boolean | null>(null);
   const [selectedMemberIds, setSelectedMemberIds] = useState<Set<string>>(
@@ -27,8 +27,6 @@ export default function HomePage() {
     firebase.isSessionOpen().then((isOpen) => {
       setIsSessionOpen(isOpen);
     });
-
-    googlerService.googlerStream.on(googler => setGoogler(googler));
   }, []);
 
   useEffect(() => {

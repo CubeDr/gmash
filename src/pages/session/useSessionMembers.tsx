@@ -3,24 +3,21 @@ import { useEffect, useState } from 'react';
 import Member from '../../data/member';
 import firebase from '../../firebase';
 import membersService from '../../services/membersService';
+import useStream from '../../useStream';
 
 export default function useSelectedMembers() {
-  const [members, setMembers] = useState<Member[]>([]);
+  const members = useStream(membersService.membersStream);
   const [sessionMembers, setSessionMembers] = useState<Member[]>([]);
 
   useEffect(() => {
-    membersService.membersStream.on(members => setMembers(members));
-  }, []);
-
-  useEffect(() => {
     const unsubscribe = firebase.listenToSessionMembers((sessionMemberMap) => {
-      const selected = sessionMemberMap
+      const selected = sessionMemberMap && members
         ? members
-            .filter((member) => member.id in sessionMemberMap)
-            .map((member) => {
-              const sessionInfo = sessionMemberMap[member.id];
-              return { ...member, ...sessionInfo };
-            })
+          .filter((member) => member.id in sessionMemberMap)
+          .map((member) => {
+            const sessionInfo = sessionMemberMap[member.id];
+            return { ...member, ...sessionInfo };
+          })
         : [];
 
       setSessionMembers(selected);

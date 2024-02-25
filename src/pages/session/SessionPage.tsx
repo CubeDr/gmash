@@ -2,10 +2,10 @@ import { Button, Dialog, DialogActions, DialogTitle } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Googler } from '../../data/googler';
 import Member from '../../data/member';
 import firebase from '../../firebase';
 import googlerService from '../../services/googlerService';
+import useStream from '../../useStream';
 
 import GameDialog from './GameDialog/GameDialog';
 import styles from './SessionPage.module.css';
@@ -16,7 +16,7 @@ import UpcomingGames from './upcomingGames/UpcomingGames';
 import useSessionMembers from './useSessionMembers';
 
 export default function SessionPage() {
-  const [googler, setGoogler] = useState<Googler | null>(null);
+  const googler = useStream(googlerService.googlerStream);
   const { members } = useSessionMembers();
   const [selectedMembers, setSelectedMembers] = useState<Set<Member>>(
     new Set()
@@ -72,10 +72,6 @@ export default function SessionPage() {
       }
     });
   }, [navigate]);
-
-  useEffect(() => {
-    googlerService.googlerStream.on(googler => setGoogler(googler));
-  }, []);
 
   return (
     <div className={selectedMembers.size > 0 ? styles.PaddingBottom : ''}>

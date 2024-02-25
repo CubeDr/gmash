@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react';
-
-import Member from '../../data/member';
 import membersService from '../../services/membersService';
+import useStream from '../../useStream';
 
 import styles from './Members.module.css';
 
@@ -18,19 +16,15 @@ export default function Members({
   selectedMemberIds,
   showElo,
 }: MembersProps) {
-  const [members, setMembers] = useState<Member[]>([]);
-
-  useEffect(() => {
-    membersService.membersStream.on(members => setMembers(members));
-  }, []);
+  const members = useStream(membersService.membersStream);
 
   return (
     <div className={styles.Members}>
       <span className={styles.TotalMembers}>
-        Total {members.length} Members
+        Total {members?.length ?? '-'} Members
       </span>
       <ol className={styles.MemberList}>
-        {members.map((member) => (
+        {members?.map((member) => (
           <li key={member.id}>
             {mode === 'select' && (
               <input
