@@ -1,12 +1,16 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Member from '../../data/member';
 import firebase from '../../firebase';
-import { MembersContext } from '../../providers/MembersContext';
+import membersService from '../../services/membersService';
 
 export default function useSelectedMembers() {
-  const { members } = useContext(MembersContext);
+  const [members, setMembers] = useState<Member[]>([]);
   const [sessionMembers, setSessionMembers] = useState<Member[]>([]);
+
+  useEffect(() => {
+    membersService.membersStream.on(members => setMembers(members));
+  }, []);
 
   useEffect(() => {
     const unsubscribe = firebase.listenToSessionMembers((sessionMemberMap) => {

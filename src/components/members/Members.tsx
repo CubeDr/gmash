@@ -1,6 +1,7 @@
-import { useContext } from 'react';
+import { useEffect, useState } from 'react';
 
-import { MembersContext } from '../../providers/MembersContext';
+import Member from '../../data/member';
+import membersService from '../../services/membersService';
 
 import styles from './Members.module.css';
 
@@ -17,7 +18,11 @@ export default function Members({
   selectedMemberIds,
   showElo,
 }: MembersProps) {
-  const { members } = useContext(MembersContext);
+  const [members, setMembers] = useState<Member[]>([]);
+
+  useEffect(() => {
+    membersService.membersStream.on(members => setMembers(members));
+  }, []);
 
   return (
     <div className={styles.Members}>

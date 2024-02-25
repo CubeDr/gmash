@@ -98,7 +98,7 @@ function listenToGames(
 
 function maybeInitialize() {
   if (isInitialized) return;
-  
+
   initializeApp(firebaseConfig);
   isInitialized = true;
 }
