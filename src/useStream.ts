@@ -6,7 +6,8 @@ export default function useStream<T>(stream: TypedStream<T>) {
     const [value, setValue] = useState<T>();
 
     useEffect(() => {
-        stream.on(value => setValue(value));
+        stream.on(setValue);
+        return () => stream.remove(setValue);
     }, [stream]);
 
     return value;

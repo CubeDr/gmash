@@ -26,4 +26,8 @@ export default class TypedStream<T> {
         }
         return new TypedStream(this.stream.on('data', listener));
     }
+
+    remove(listener: Listener<T>) {
+        this.stream.off('data', listener);
+    }
 }
