@@ -1,3 +1,4 @@
+import { initializeApp } from 'firebase/app';
 import {
   getAuth,
   signInWithPopup,
@@ -35,6 +36,20 @@ import Member from '../data/member';
 import { IDBySessionMember } from '../data/sessionMember';
 
 import Firebase from './firebase';
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyDaVS0MghioqcmFTBdwNrdV9P5Zpu2ilUs',
+  authDomain: 'gmash-496a9.firebaseapp.com',
+  projectId: 'gmash-496a9',
+  storageBucket: 'gmash-496a9.appspot.com',
+  messagingSenderId: '131659335029',
+  appId: '1:131659335029:web:d675ce7e9cbe1dba753f3c',
+  measurementId: 'G-X17ZEEE5DZ',
+  databaseURL:
+    'https://gmash-496a9-default-rtdb.asia-southeast1.firebasedatabase.app',
+};
+
+let isInitialized = false;
 
 let sessionId: string | null = null;
 
@@ -81,8 +96,16 @@ function listenToGames(
   });
 }
 
+function maybeInitialize() {
+  if (isInitialized) return;
+  
+  initializeApp(firebaseConfig);
+  isInitialized = true;
+}
+
 const firebaseImpl: Firebase = {
   signIn() {
+    maybeInitialize();
     const auth = getAuth();
     if (auth.currentUser != null) {
       return;
@@ -96,14 +119,17 @@ const firebaseImpl: Firebase = {
   },
 
   signOut() {
+    maybeInitialize();
     signOut(getAuth());
   },
 
   onAuthStateChanged(callback: (user: User | null) => void) {
+    maybeInitialize();
     return onAuthStateChanged(getAuth(), (user) => callback(user));
   },
 
   register(id: string, name: string) {
+    maybeInitialize();
     return setDoc(doc(getFirestore(), 'googlers', id), {
       name,
       elo: 1000,
@@ -112,6 +138,7 @@ const firebaseImpl: Firebase = {
   },
 
   async getGoogler(user: User) {
+    maybeInitialize();
     const snapshot = await getDoc(doc(getFirestore(), 'googlers', user.uid));
     return {
       user,
@@ -120,11 +147,13 @@ const firebaseImpl: Firebase = {
   },
 
   async getAllMembers() {
+    maybeInitialize();
     const snapshot = await getDocs(collection(getFirestore(), 'googlers'));
     return snapshotToMembers(snapshot);
   },
 
   async getMembersById(ids: string[]) {
+    maybeInitialize();
     const snapshot = await getDocs(
       query(
         collection(getFirestore(), 'googlers'),
@@ -135,6 +164,7 @@ const firebaseImpl: Firebase = {
   },
 
   async updateSessionMembers(ids: string[]) {
+    maybeInitialize();
     const sessionMembers: IDBySessionMember = {};
 
     const existingMembers =
@@ -148,8 +178,6 @@ const firebaseImpl: Firebase = {
       }
     });
 
-    console.log(sessionMembers);
-
     try {
       await set(ref(getDatabase(), 'members'), sessionMembers);
     } catch (e) {
@@ -158,6 +186,7 @@ const firebaseImpl: Firebase = {
   },
 
   async getSessionMembers() {
+    maybeInitialize();
     const members: IDBySessionMember =
       (await get(ref(getDatabase(), 'members'))).val() ?? {};
 
@@ -167,12 +196,14 @@ const firebaseImpl: Firebase = {
   listenToSessionMembers(
     listener: (sessionMembers: IDBySessionMember) => void
   ) {
+    maybeInitialize();
     return onValue(ref(getDatabase(), 'members'), (snapshot) => {
       listener(snapshot.val());
     });
   },
 
   async isSessionOpen() {
+    maybeInitialize();
     const val = (await get(ref(getDatabase(), 'sessionId'))).val();
     if (val == null) {
       sessionId = null;
@@ -184,11 +215,13 @@ const firebaseImpl: Firebase = {
   },
 
   async createSession() {
+    maybeInitialize();
     sessionId = Date.now().toString();
     await set(ref(getDatabase(), 'sessionId'), sessionId);
   },
 
   async closeSession() {
+    maybeInitialize();
     const members: IDBySessionMember = (
       await get(ref(getDatabase(), 'members'))
     ).val();
@@ -204,6 +237,7 @@ const firebaseImpl: Firebase = {
   },
 
   addUpcomingGame(team1: string[], team2: string[]) {
+    maybeInitialize();
     return addGame('upcoming', { team1, team2 });
   },
 
@@ -212,10 +246,12 @@ const firebaseImpl: Firebase = {
       games: { team1: string[]; team2: string[]; ref: DatabaseReference }[]
     ) => void
   ) {
+    maybeInitialize();
     return listenToGames('upcoming', listener);
   },
 
   addPlayingGame(team1: string[], team2: string[]) {
+    maybeInitialize();
     return addGame('playing', { team1, team2 });
   },
 
@@ -224,10 +260,12 @@ const firebaseImpl: Firebase = {
       games: { team1: string[]; team2: string[]; ref: DatabaseReference }[]
     ) => void
   ) {
+    maybeInitialize();
     return listenToGames('playing', listener);
   },
 
   async addGameResult(win, lose) {
+    maybeInitialize();
     await addDoc(collection(getFirestore(), 'gameResult'), {
       win,
       lose,
@@ -236,10 +274,12 @@ const firebaseImpl: Firebase = {
   },
 
   update(ref, value) {
+    maybeInitialize();
     return set(ref, value);
   },
 
   delete(ref) {
+    maybeInitialize();
     return remove(ref);
   },
 };
