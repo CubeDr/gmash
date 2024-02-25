@@ -185,12 +185,12 @@ const firebaseImpl: Firebase = {
     }
   },
 
-  async getSessionMembers() {
+  async getSessionMembersMap() {
     maybeInitialize();
     const members: IDBySessionMember =
       (await get(ref(getDatabase(), 'members'))).val() ?? {};
 
-    return Object.keys(members);
+    return members;
   },
 
   listenToSessionMembers(

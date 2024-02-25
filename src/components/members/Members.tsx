@@ -8,6 +8,7 @@ interface MembersProps {
   onSelectedMemberIdsChange: (memberId: string) => void;
   selectedMemberIds: Set<string>;
   showElo: boolean;
+  disabledMemberIds: Set<string>;
 }
 
 export default function Members({
@@ -15,6 +16,7 @@ export default function Members({
   onSelectedMemberIdsChange,
   selectedMemberIds,
   showElo,
+  disabledMemberIds,
 }: MembersProps) {
   const members = useStream(membersService.membersStream);
 
@@ -25,13 +27,14 @@ export default function Members({
       </span>
       <ol className={styles.MemberList}>
         {members?.map((member) => (
-          <li key={member.id}>
+          <li key={member.id} className={styles.MemberListItem}>
             {mode === 'select' && (
               <input
                 type="checkbox"
                 id={member.id}
                 className={styles.Checkbox}
                 defaultChecked={selectedMemberIds.has(member.id)}
+                disabled={disabledMemberIds.has(member.id)}
                 onChange={() => {
                   onSelectedMemberIdsChange(member.id);
                 }}
@@ -40,6 +43,9 @@ export default function Members({
             <label className={styles.Label} htmlFor={member.id}>
               {member.name + (showElo ? ' (' + member.elo + ')' : '')}
             </label>
+            {disabledMemberIds.has(member.id) && (
+              <span className={styles.MemberText}>(in-game)</span>
+            )}
           </li>
         ))}
       </ol>
