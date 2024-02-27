@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import Members from '../../components/members/Members';
+import { IDBySessionMember } from '../../data/sessionMember';
 import firebase from '../../firebase';
 import googlerService from '../../services/googlerService';
 import useStream from '../../useStream';
@@ -20,6 +21,9 @@ export default function HomePage() {
   const [selectedMemberIds, setSelectedMemberIds] = useState<Set<string>>(
     new Set()
   );
+  // TODO: update with playing info.
+  // Participant IDs for SessionMembers involved in upcoming games.
+  const [participantIds, setParticipantIds] = useState<Set<string>>(new Set());
   const [showElo, setShowElo] = useState(false);
   const navigate = useNavigate();
 
@@ -31,12 +35,17 @@ export default function HomePage() {
 
   useEffect(() => {
     if (isSessionOpen) {
-      firebase.getSessionMembers().then((members) => {
-        setSelectedMemberIds(new Set(members));
+      firebase.getSessionMembersMap().then((membersMap: IDBySessionMember) => {
+        setSelectedMemberIds(new Set(Object.keys(membersMap)));
         if (
           googler?.role === 'organizer' &&
           queryParams.get(EDIT_SESSION_QUERY_PARAM) === 'true'
         ) {
+          const players = Object.keys(membersMap).filter((key) => {
+            const { upcoming } = membersMap[key];
+            return upcoming > 0;
+          });
+          setParticipantIds(new Set(players));
           setIsSelectingMember(true);
         }
       });
@@ -122,8 +131,14 @@ export default function HomePage() {
     <div className={styles.HomePage}>
       <div className={styles.Title}>GMASH</div>
       {showEloToggle() && (
-        <div className={styles.EloToggle + (showElo ? ' ' + styles.EloToggleOff : '')}
-          onClick={() => setShowElo(showElo => !showElo)}>Toggle Elo</div>
+        <div
+          className={
+            styles.EloToggle + (showElo ? ' ' + styles.EloToggleOff : '')
+          }
+          onClick={() => setShowElo((showElo) => !showElo)}
+        >
+          Toggle Elo
+        </div>
       )}
       {showMembers() && (
         <div className={styles.MembersContainer}>
@@ -132,6 +147,7 @@ export default function HomePage() {
             onSelectedMemberIdsChange={onSelectedMemberIdsChange}
             selectedMemberIds={selectedMemberIds}
             showElo={showElo}
+            disabledMemberIds={participantIds}
           />
         </div>
       )}
