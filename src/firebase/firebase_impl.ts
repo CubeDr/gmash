@@ -49,6 +49,8 @@ const firebaseConfig = {
     'https://gmash-496a9-default-rtdb.asia-southeast1.firebasedatabase.app',
 };
 
+const GAME_RESULT_KEY = 'gameResult';
+
 let isInitialized = false;
 
 let sessionId: string | null = null;
@@ -225,14 +227,17 @@ const firebaseImpl: Firebase = {
     const members: IDBySessionMember = (
       await get(ref(getDatabase(), 'members'))
     ).val();
+    const gameResult = (await get(ref(getDatabase(), GAME_RESULT_KEY))).val();
     await addDoc(collection(getFirestore(), 'session'), {
       id: sessionId,
       members: Object.keys(members),
+      gameResult,
     });
     await remove(ref(getDatabase(), 'sessionId'));
     await remove(ref(getDatabase(), 'members'));
     await remove(ref(getDatabase(), 'upcoming'));
     await remove(ref(getDatabase(), 'playing'));
+    await remove(ref(getDatabase(), GAME_RESULT_KEY));
     sessionId = null;
   },
 
@@ -266,6 +271,8 @@ const firebaseImpl: Firebase = {
 
   async addGameResult(win, lose) {
     maybeInitialize();
+    set(push(ref(getDatabase(), GAME_RESULT_KEY)), { win, lose });
+    // TODO: should be remove after migration.
     await addDoc(collection(getFirestore(), 'gameResult'), {
       win,
       lose,
