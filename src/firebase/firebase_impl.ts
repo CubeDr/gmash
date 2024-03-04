@@ -167,21 +167,25 @@ const firebaseImpl: Firebase = {
 
   async updateSessionMembers(ids: string[]) {
     maybeInitialize();
-    const sessionMembers: IDBySessionMember = {};
 
     const existingMembers =
       (await get(ref(getDatabase(), 'members'))).val() ?? {};
+    const newMemberIds = ids.filter((id) => !(id in existingMembers));
+    let newMembers = {};
 
-    ids.forEach((id) => {
-      if (id in existingMembers) {
-        sessionMembers[id] = existingMembers[id];
-      } else {
-        sessionMembers[id] = { played: 0, upcoming: 0 };
-      }
-    });
+    if (newMemberIds.length > 0) {
+      const newMemberList = await this.getMembersById(newMemberIds);
+      newMembers = newMemberList.reduce((result, member) => {
+        result[member.id] = { played: 0, upcoming: 0, elo: member.elo };
+        return result;
+      }, {} as IDBySessionMember);
+    }
 
     try {
-      await set(ref(getDatabase(), 'members'), sessionMembers);
+      await set(ref(getDatabase(), 'members'), {
+        ...existingMembers,
+        ...newMembers,
+      });
     } catch (e) {
       console.error(e);
     }
