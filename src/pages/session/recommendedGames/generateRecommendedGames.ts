@@ -69,20 +69,42 @@ function getInsufficientGames(game: Game, maxPlayedCount: number, playingMemberI
     .reduce((a, b) => a + b, 0);
 }
 
-function scoreGame(game: Game, maxPlayedCount: number, playingMemberIds: Set<string>): ScoredGame {
+function getTeamIdentifier(team: Member[]) {
+  return team.map(m => m.id).sort().join();
+}
+
+function isSameGame(game1: Game, game2: Game) {
+  if (game1 === game2) return true;
+  const team11 = getTeamIdentifier(game1.team1);
+  const team12 = getTeamIdentifier(game1.team2);
+  const team21 = getTeamIdentifier(game2.team1);
+  const team22 = getTeamIdentifier(game2.team2);
+  
+  return (team11 === team21 && team12 === team22) || (team11 === team22 && team12 === team21);
+}
+
+function isExactDuplicate(game: Game, allGames: Game[]) {
+  for (const g of allGames) {
+    if (isSameGame(game, g)) return true;
+  }
+  return false;
+}
+
+function scoreGame(game: Game, maxPlayedCount: number, playingMemberIds: Set<string>, allGames: Game[]): ScoredGame {
   const eloDiff = getTeamEloDiff(game);
   const insufficientGames = getInsufficientGames(game, maxPlayedCount, playingMemberIds);
+  const exactDupe = isExactDuplicate(game, allGames) ? 1 : 0;
 
-  const score = eloDiff * -1 + insufficientGames * 350;
+  const score = eloDiff * -1 + insufficientGames * 350 + exactDupe * -1000;
 
   return { game, score };
 }
 
-export default function generateRecommendedGames(members: Member[], playingMemberIds: Set<string>): Game[] {
+export default function generateRecommendedGames(members: Member[], playingMemberIds: Set<string>, allGames: Game[]): Game[] {
   const maxPlayedCount = getMaxGameCount(members, playingMemberIds);
 
   return generateAllPossibleGames(members)
-    .map(game => scoreGame(game, maxPlayedCount, playingMemberIds))
+    .map(game => scoreGame(game, maxPlayedCount, playingMemberIds, allGames))
     .sort((a, b) => b.score - a.score)
     .slice(0, 10)
     .map(scoredGame => scoredGame.game);

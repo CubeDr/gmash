@@ -78,9 +78,9 @@ export default function SessionPage() {
       <h4 className={styles.SectionTitle}>Now playing</h4>
       <PlayingGames />
       <h4 className={styles.SectionTitle}>Upcoming</h4>
-      <UpcomingGames members={members} />
+      <UpcomingGames />
       <h4 className={styles.SectionTitle}>Recommended</h4>
-      <RecommendedGames members={members} />
+      <RecommendedGames />
       <div className={styles.MembersTab}>
         <h4 className={styles.SectionTitle}>Members</h4>
         {showSessionEditButton() && (

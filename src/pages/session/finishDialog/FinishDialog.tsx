@@ -2,8 +2,7 @@ import { Button, Dialog, DialogActions, DialogTitle } from '@mui/material';
 import { useRef } from 'react';
 
 import Game from '../../../data/game';
-import Member from '../../../data/member';
-import firebase from '../../../firebase';
+import gameService from '../../../services/gameService';
 
 import styles from './FinishDialog.module.css';
 
@@ -11,13 +10,6 @@ interface FinishDialogProps {
   game: Game;
   open: boolean;
   onClose: (success?: boolean) => void;
-}
-
-function toTeam(team: Member[], score: number) {
-  return {
-    playersId: team.map((member) => member.id),
-    score,
-  };
 }
 
 export default function FinishDialog({
@@ -39,14 +31,7 @@ export default function FinishDialog({
     const team1Score = Number(team1ScoreInputRef.current.value);
     const team2Score = Number(team2ScoreInputRef.current.value);
 
-    const team1 = toTeam(game.team1, team1Score);
-    const team2 = toTeam(game.team2, team2Score);
-
-    const win = team1Score > team2Score ? team1 : team2;
-    const lose = team1Score > team2Score ? team2 : team1;
-
-    firebase.delete(game.ref!);
-    firebase.addGameResult(win, lose);
+    gameService.recordPlayedGame(game, team1Score, team2Score);
 
     onClose(true);
   }

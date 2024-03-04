@@ -1,23 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
-
 import Game from '../../../data/game';
-import Member from '../../../data/member';
 import firebase from '../../../firebase';
+import gameService from '../../../services/gameService';
+import useStream from '../../../useStream';
 import GameRow from '../gameRow/GameRow';
 
-interface Props {
-  members: Member[];
-}
-
-export default function UpcomingGames({ members }: Props) {
-  const [games, setGames] = useState<Game[]>([]);
-
-  const getMemberById = useCallback(
-    (id: string) => {
-      return members.find((member) => member.id === id)!;
-    },
-    [members]
-  );
+export default function UpcomingGames() {
+  const games = useStream(gameService.upcomingGamesStream);
 
   async function playGame(game: Game) {
     if (game.ref == null) throw new Error('Game is not registered correctly.');
@@ -35,23 +23,9 @@ export default function UpcomingGames({ members }: Props) {
     await firebase.delete(game.ref);
   }
 
-  useEffect(() => {
-    const unsubscribe = firebase.listenToUpcomingGames((upcomingGames) => {
-      if (members.length === 0) return;
-
-      const games: Game[] = upcomingGames.map((game) => ({
-        team1: game.team1.map((id) => getMemberById(id)),
-        team2: game.team2.map((id) => getMemberById(id)),
-        ref: game.ref,
-      }));
-      setGames(games);
-    });
-    return () => unsubscribe();
-  }, [members, getMemberById]);
-
   return (
     <GameRow
-      games={games}
+      games={games ?? []}
       dialog={{
         title: 'Update an upcoming game',
         actions: [
