@@ -5,7 +5,7 @@ import { Googler } from '../data/googler';
 import Member from '../data/member';
 import { IDBySessionMember } from '../data/sessionMember';
 
-interface GameResultTeam {
+export interface GameResultTeam {
   playersId: string[];
   score: number;
 }
@@ -43,6 +43,7 @@ export default interface Firebase {
   ) => Unsubscribe;
 
   addGameResult: (win: GameResultTeam, lose: GameResultTeam) => Promise<void>;
+  listenToGameResults: (listener: (gameResults: {win: GameResultTeam, lose: GameResultTeam}[]) => void) => Unsubscribe;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   update: (ref: DatabaseReference, value: any) => Promise<void>;

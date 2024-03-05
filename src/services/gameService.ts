@@ -13,9 +13,6 @@ function toTeam(team: Member[], score: number) {
 }
 
 class GameService {
-    // TODO: Integrate with Firebase
-    private readonly playedGames: Game[] = [];
-
     readonly allGamesStream = new TypedStream<Game[]>();
 
     readonly playedGamesStream = new TypedStream<Game[]>();
@@ -23,6 +20,15 @@ class GameService {
     readonly upcomingGamesStream = new TypedStream<Game[]>();
 
     constructor() {
+        firebase.listenToGameResults((gameResults) => {
+            const games: Game[] = gameResults.map((gameResult) => ({
+                team1: gameResult.win.playersId.map((id) => membersService.getMemberById(id)!),
+                team2: gameResult.lose.playersId.map((id) => membersService.getMemberById(id)!),
+            }));
+            this.playedGamesStream.write(games);
+            this.onGamesUpdated();
+        });
+
         firebase.listenToPlayingGames((playingGames) => {
             const games: Game[] = playingGames.map((game) => ({
                 team1: game.team1.map((id) => membersService.getMemberById(id)!),
@@ -54,8 +60,6 @@ class GameService {
         firebase.delete(game.ref!);
         firebase.addGameResult(win, lose);
 
-        this.playedGames.push(game);
-        this.playingGamesStream.write([...this.playedGames]);
         this.onGamesUpdated();
     }
 

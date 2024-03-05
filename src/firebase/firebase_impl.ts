@@ -35,7 +35,7 @@ import {
 import Member from '../data/member';
 import { IDBySessionMember } from '../data/sessionMember';
 
-import Firebase from './firebase';
+import Firebase, { GameResultTeam } from './firebase';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDaVS0MghioqcmFTBdwNrdV9P5Zpu2ilUs',
@@ -277,6 +277,19 @@ const firebaseImpl: Firebase = {
       win,
       lose,
       sessionId,
+    });
+  },
+  
+  listenToGameResults(listener: (gameResults: {win: GameResultTeam, lose: GameResultTeam}[]) => void) {
+    return onValue(ref(getDatabase(), GAME_RESULT_KEY), (snapshot) => {
+      const gameResults: {win: GameResultTeam, lose: GameResultTeam}[] = [];
+      snapshot.forEach((gameResultSnapshot) => {
+        gameResults.push({
+          win: gameResultSnapshot.val().win,
+          lose: gameResultSnapshot.val().lose,
+        });
+      });
+      listener(gameResults);
     });
   },
 
