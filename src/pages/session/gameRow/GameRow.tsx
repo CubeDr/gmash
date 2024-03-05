@@ -10,13 +10,14 @@ import styles from './GameRow.module.css';
 
 interface GameRowProps {
   games: Game[];
+  playingMemberIds?: Set<string>;
   dialog?: {
     title: string;
     actions?: GameDialogAction[];
   };
 }
 
-export default function GameRow({ games, dialog }: GameRowProps) {
+export default function GameRow({ games, playingMemberIds, dialog }: GameRowProps) {
   const googler = useStream(googlerService.googlerStream);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
 
@@ -33,6 +34,7 @@ export default function GameRow({ games, dialog }: GameRowProps) {
         <Court
           key={'upcoming-' + i}
           game={game}
+          playingMemberIds={playingMemberIds}
           onClick={() => onGameClick(game)}
         />
       ))}

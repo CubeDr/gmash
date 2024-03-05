@@ -8,7 +8,11 @@ import useSessionMembers from '../useSessionMembers';
 
 import generateRecommendedGames from './generateRecommendedGames';
 
-export default function RecommendedGames() {
+interface Props {
+  playingMemberIds: Set<string>;
+}
+
+export default function RecommendedGames({ playingMemberIds }: Props) {
   const { members } = useSessionMembers();
   const playingGames = useStream(gameService.playingGamesStream);
   const allGames = useStream(gameService.allGamesStream);
@@ -24,6 +28,7 @@ export default function RecommendedGames() {
   return (
     <GameRow
       games={recommendedGames}
+      playingMemberIds={playingMemberIds}
       dialog={{
         title: 'Recommended game',
         actions: [],

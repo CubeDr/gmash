@@ -4,10 +4,11 @@ import styles from './Court.module.css';
 
 interface CourtProps {
   game: Game;
+  playingMemberIds?: Set<string>;
   onClick?: (game: Game) => void;
 }
 
-export default function Court({ game, onClick }: CourtProps) {
+export default function Court({ game, playingMemberIds, onClick }: CourtProps) {
   return (
     <div
       className={styles.Court}
@@ -16,7 +17,7 @@ export default function Court({ game, onClick }: CourtProps) {
       <div className={styles.CourtContent}>
         <div className={styles.Team}>
           {game.team1.map((member) => (
-            <span key={member.id} className={styles.Player}>
+            <span key={member.id} className={styles.Player + (playingMemberIds?.has(member.id) ? (' ' + styles.Playing) : '')}>
               {member.name}
             </span>
           ))}
@@ -24,7 +25,7 @@ export default function Court({ game, onClick }: CourtProps) {
         <hr className={styles.Divider} />
         <div className={styles.Team}>
           {game.team2.map((member) => (
-            <span key={member.id} className={styles.Player}>
+            <span key={member.id} className={styles.Player + (playingMemberIds?.has(member.id) ? (' ' + styles.Playing) : '')}>
               {member.name}
             </span>
           ))}

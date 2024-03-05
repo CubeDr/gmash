@@ -4,7 +4,11 @@ import gameService from '../../../services/gameService';
 import useStream from '../../../useStream';
 import GameRow from '../gameRow/GameRow';
 
-export default function UpcomingGames() {
+interface Props {
+  playingMemberIds: Set<string>;
+}
+
+export default function UpcomingGames({ playingMemberIds }: Props) {
   const games = useStream(gameService.upcomingGamesStream);
 
   async function playGame(game: Game) {
@@ -26,6 +30,7 @@ export default function UpcomingGames() {
   return (
     <GameRow
       games={games ?? []}
+      playingMemberIds={playingMemberIds}
       dialog={{
         title: 'Update an upcoming game',
         actions: [

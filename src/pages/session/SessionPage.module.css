@@ -52,3 +52,13 @@
 .EditMembersButton {
   padding-right: 10px;
 }
+
+.Playing {
+  animation: blink-effect 1.5s infinite;
+}
+
+@keyframes blink-effect {
+  50% {
+    opacity: 0;
+  }
+}

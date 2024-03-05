@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import Member from '../../data/member';
 import firebase from '../../firebase';
+import gameService from '../../services/gameService';
 import googlerService from '../../services/googlerService';
 import useStream from '../../useStream';
 
@@ -24,6 +25,17 @@ export default function SessionPage() {
   const [openMakeGameDialog, setOpenMakeGameDialog] = useState(false);
   const [openCloseSessionDialog, setOpenCloseSessionDialog] = useState(false);
   const navigate = useNavigate();
+
+  const playingGames = useStream(gameService.playingGamesStream);
+  const [playingMemberIds, setPlayingMemberIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (playingGames == null) return;
+
+    setPlayingMemberIds(new Set(
+      playingGames.flatMap(game => ([...game.team1.map(member => member.id), ...game.team2.map(member => member.id)]))
+    ));
+  }, [playingGames]);
 
   function makeGameFromSelectedMembers() {
     const sorted = Array.from(selectedMembers).sort((a, b) => b.elo - a.elo);
@@ -78,9 +90,9 @@ export default function SessionPage() {
       <h4 className={styles.SectionTitle}>Now playing</h4>
       <PlayingGames />
       <h4 className={styles.SectionTitle}>Upcoming</h4>
-      <UpcomingGames />
+      <UpcomingGames playingMemberIds={playingMemberIds} />
       <h4 className={styles.SectionTitle}>Recommended</h4>
-      <RecommendedGames />
+      <RecommendedGames  playingMemberIds={playingMemberIds} />
       <div className={styles.MembersTab}>
         <h4 className={styles.SectionTitle}>Members</h4>
         {showSessionEditButton() && (
@@ -102,6 +114,7 @@ export default function SessionPage() {
             key={member.id}
             member={member}
             isSelected={selectedMembers.has(member)}
+            isPlaying={playingMemberIds.has(member.id)}
             onClick={onMemberClick}
           />
         ))}
