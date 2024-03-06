@@ -15,6 +15,7 @@ export default interface Firebase {
   onAuthStateChanged: (callback: (user: User | null) => void) => Unsubscribe;
   register: (id: string, name: string) => Promise<void>;
   getGoogler: (user: User) => Promise<Googler>;
+  updateGoogler: (id: string, elo: number) => Promise<void>;
   getAllMembers: () => Promise<Member[]>;
   getMembersById: (ids: string[]) => Promise<Member[]>;
 

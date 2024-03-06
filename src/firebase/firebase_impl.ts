@@ -30,6 +30,7 @@ import {
   query,
   setDoc,
   where,
+  updateDoc,
 } from 'firebase/firestore';
 
 import Member from '../data/member';
@@ -148,6 +149,11 @@ const firebaseImpl: Firebase = {
     };
   },
 
+  async updateGoogler(id: string, elo: number) {
+    maybeInitialize();
+    return await updateDoc(doc(getFirestore(), 'googlers', id), { elo: elo });
+  },
+
   async getAllMembers() {
     maybeInitialize();
     const snapshot = await getDocs(collection(getFirestore(), 'googlers'));
@@ -237,6 +243,11 @@ const firebaseImpl: Firebase = {
       members: Object.keys(members),
       gameResult,
     });
+    await Promise.all(
+      Object.entries(members).map(async ([id, member]) => {
+        await this.updateGoogler(id, member.elo);
+      })
+    );
     await remove(ref(getDatabase(), 'sessionId'));
     await remove(ref(getDatabase(), 'members'));
     await remove(ref(getDatabase(), 'upcoming'));
