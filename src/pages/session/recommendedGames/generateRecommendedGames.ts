@@ -90,55 +90,65 @@ function isExactDuplicate(game: Game, allGames: Game[]) {
   return false;
 }
 
-function getThreeIdentifier(ids: string[]) {
+function getIdentifier(ids: string[]) {
   return ids.sort().join();
+}
+
+function toTeamIdentifiers(game: Game) {
+  return [
+    getTeamIdentifier(game.team1),
+    getTeamIdentifier(game.team2),
+  ];
 }
 
 function toThreeIdentifiers(game: Game) {
   const ids = [...game.team1, ...game.team2].flatMap(member => member.id);
   const identifiers = [];
   for (let i = 0; i < ids.length; i++) {
-    identifiers.push(getThreeIdentifier([...ids.slice(0, i), ...ids.slice(i + 1, ids.length)]));
+    identifiers.push(getIdentifier([...ids.slice(0, i), ...ids.slice(i + 1, ids.length)]));
   }
   return identifiers;
 }
 
-function generateThreeIdentifiersCountMap(games: Game[]) {
+function generateIdentifiersCountMap(games: Game[], identifierFunction: (game: Game) => string[]) {
   const map = new Map<string, number>();
   for (const game of games) {
-    for (const identifier of toThreeIdentifiers(game)) {
+    for (const identifier of identifierFunction(game)) {
       map.set(identifier, (map.get(identifier) ?? 0) + 1);
     }
   }
   return map;
 }
 
-function countThreeDuplicates(game: Game, threeIdentifiersCountMap: Map<string, number>) {
-  return toThreeIdentifiers(game)
-    .map(identifier => threeIdentifiersCountMap.get(identifier) ?? 0)
+function countIdentifierDuplicates(game: Game, identifierFunction: (game: Game) => string[], countMap: Map<string, number>) {
+  return identifierFunction(game)
+    .map(identifier => countMap.get(identifier) ?? 0)
     .reduce((a, b) => a + b, 0);
 }
 
 function scoreGame(game: Game, maxPlayedCount: number,
   playingMemberIds: Set<string>,
   allGames: Game[],
+  twoIdentifiersCountMap: Map<string, number>,
   threeIdentifiersCountMap: Map<string, number>): ScoredGame {
   const eloDiff = getTeamEloDiff(game);
   const insufficientGames = getInsufficientGames(game, maxPlayedCount, playingMemberIds);
   const exactDupe = isExactDuplicate(game, allGames) ? 1 : 0;
-  const threeDupes = countThreeDuplicates(game, threeIdentifiersCountMap);
+  const teamDupes = countIdentifierDuplicates(game, toTeamIdentifiers, twoIdentifiersCountMap);
+  const threeDupes = countIdentifierDuplicates(game, toThreeIdentifiers, threeIdentifiersCountMap);
 
-  const score = eloDiff * -1 + insufficientGames * 350 + exactDupe * -1000 + threeDupes * -80;
+  const score = eloDiff * -1 + insufficientGames * 350 + exactDupe * -800 + teamDupes * -100 + threeDupes * -80;
 
   return { game, score };
 }
 
 export default function generateRecommendedGames(members: Member[], playingMemberIds: Set<string>, allGames: Game[]): Game[] {
   const maxPlayedCount = getMaxGameCount(members, playingMemberIds);
-  const threeIdentifiersCountMap = generateThreeIdentifiersCountMap(allGames);
+  const teamIdentifiersCountMap = generateIdentifiersCountMap(allGames, toTeamIdentifiers);
+  const threeIdentifiersCountMap = generateIdentifiersCountMap(allGames, toThreeIdentifiers);
 
   return generateAllPossibleGames(members)
-    .map(game => scoreGame(game, maxPlayedCount, playingMemberIds, allGames, threeIdentifiersCountMap))
+    .map(game => scoreGame(game, maxPlayedCount, playingMemberIds, allGames, teamIdentifiersCountMap, threeIdentifiersCountMap))
     .sort((a, b) => b.score - a.score)
     .slice(0, 10)
     .map(scoredGame => scoredGame.game);
