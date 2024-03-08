@@ -30,6 +30,7 @@ import {
   query,
   setDoc,
   where,
+  updateDoc,
 } from 'firebase/firestore';
 
 import Member from '../data/member';
@@ -148,6 +149,11 @@ const firebaseImpl: Firebase = {
     };
   },
 
+  async updateGoogler(id: string, elo: number) {
+    maybeInitialize();
+    return await updateDoc(doc(getFirestore(), 'googlers', id), { elo: elo });
+  },
+
   async getAllMembers() {
     maybeInitialize();
     const snapshot = await getDocs(collection(getFirestore(), 'googlers'));
@@ -167,21 +173,41 @@ const firebaseImpl: Firebase = {
 
   async updateSessionMembers(ids: string[]) {
     maybeInitialize();
-    const sessionMembers: IDBySessionMember = {};
 
-    const existingMembers =
-      (await get(ref(getDatabase(), 'members'))).val() ?? {};
+    const idSet = new Set(ids);
+    const existingMembers = await this.getSessionMembersMap();
 
-    ids.forEach((id) => {
-      if (id in existingMembers) {
-        sessionMembers[id] = existingMembers[id];
+    // Update canPlay field in existing members.
+    const updatedExistingMembers: IDBySessionMember = {};
+    Object.entries(existingMembers).map(([id, member]) => {
+      if (idSet.has(id)) {
+        updatedExistingMembers[id] = { ...member, canPlay: true };
       } else {
-        sessionMembers[id] = { played: 0, upcoming: 0 };
+        updatedExistingMembers[id] = { ...member, canPlay: false };
       }
     });
 
+    // Update new members.
+    const newMemberIds = ids.filter((id) => !(id in existingMembers));
+    let newMembers = {};
+    if (newMemberIds.length > 0) {
+      const newMemberList = await this.getMembersById(newMemberIds);
+      newMembers = newMemberList.reduce((result, member) => {
+        result[member.id] = {
+          played: 0,
+          upcoming: 0,
+          elo: member.elo,
+          canPlay: true,
+        };
+        return result;
+      }, {} as IDBySessionMember);
+    }
+
     try {
-      await set(ref(getDatabase(), 'members'), sessionMembers);
+      await set(ref(getDatabase(), 'members'), {
+        ...updatedExistingMembers,
+        ...newMembers,
+      });
     } catch (e) {
       console.error(e);
     }
@@ -233,6 +259,11 @@ const firebaseImpl: Firebase = {
       members: Object.keys(members),
       gameResult,
     });
+    await Promise.all(
+      Object.entries(members).map(async ([id, member]) => {
+        await this.updateGoogler(id, member.elo);
+      })
+    );
     await remove(ref(getDatabase(), 'sessionId'));
     await remove(ref(getDatabase(), 'members'));
     await remove(ref(getDatabase(), 'upcoming'));
@@ -279,10 +310,14 @@ const firebaseImpl: Firebase = {
       sessionId,
     });
   },
-  
-  listenToGameResults(listener: (gameResults: {win: GameResultTeam, lose: GameResultTeam}[]) => void) {
+
+  listenToGameResults(
+    listener: (
+      gameResults: { win: GameResultTeam; lose: GameResultTeam }[]
+    ) => void
+  ) {
     return onValue(ref(getDatabase(), GAME_RESULT_KEY), (snapshot) => {
-      const gameResults: {win: GameResultTeam, lose: GameResultTeam}[] = [];
+      const gameResults: { win: GameResultTeam; lose: GameResultTeam }[] = [];
       snapshot.forEach((gameResultSnapshot) => {
         gameResults.push({
           win: gameResultSnapshot.val().win,

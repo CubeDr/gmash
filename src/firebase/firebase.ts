@@ -15,6 +15,7 @@ export default interface Firebase {
   onAuthStateChanged: (callback: (user: User | null) => void) => Unsubscribe;
   register: (id: string, name: string) => Promise<void>;
   getGoogler: (user: User) => Promise<Googler>;
+  updateGoogler: (id: string, elo: number) => Promise<void>;
   getAllMembers: () => Promise<Member[]>;
   getMembersById: (ids: string[]) => Promise<Member[]>;
 
@@ -43,7 +44,11 @@ export default interface Firebase {
   ) => Unsubscribe;
 
   addGameResult: (win: GameResultTeam, lose: GameResultTeam) => Promise<void>;
-  listenToGameResults: (listener: (gameResults: {win: GameResultTeam, lose: GameResultTeam}[]) => void) => Unsubscribe;
+  listenToGameResults: (
+    listener: (
+      gameResults: { win: GameResultTeam; lose: GameResultTeam }[]
+    ) => void
+  ) => Unsubscribe;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   update: (ref: DatabaseReference, value: any) => Promise<void>;

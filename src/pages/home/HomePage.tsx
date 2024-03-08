@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import Members from '../../components/members/Members';
-import { IDBySessionMember } from '../../data/sessionMember';
 import firebase from '../../firebase';
 import googlerService from '../../services/googlerService';
 import useStream from '../../useStream';
@@ -35,8 +34,11 @@ export default function HomePage() {
 
   useEffect(() => {
     if (isSessionOpen) {
-      firebase.getSessionMembersMap().then((membersMap: IDBySessionMember) => {
-        setSelectedMemberIds(new Set(Object.keys(membersMap)));
+      firebase.getSessionMembersMap().then((membersMap) => {
+        const canPlayMemberList = Object.keys(membersMap).filter(
+          (key) => membersMap[key].canPlay
+        );
+        setSelectedMemberIds(new Set(canPlayMemberList));
         if (
           googler?.role === 'organizer' &&
           queryParams.get(EDIT_SESSION_QUERY_PARAM) === 'true'
