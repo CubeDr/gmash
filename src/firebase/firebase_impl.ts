@@ -174,22 +174,38 @@ const firebaseImpl: Firebase = {
   async updateSessionMembers(ids: string[]) {
     maybeInitialize();
 
-    const existingMembers =
-      (await get(ref(getDatabase(), 'members'))).val() ?? {};
+    const idSet = new Set(ids);
+    const existingMembers = await this.getSessionMembersMap();
+
+    // Update canPlay field in existing members.
+    const updatedExistingMembers: IDBySessionMember = {};
+    Object.entries(existingMembers).map(([id, member]) => {
+      if (idSet.has(id)) {
+        updatedExistingMembers[id] = { ...member, canPlay: true };
+      } else {
+        updatedExistingMembers[id] = { ...member, canPlay: false };
+      }
+    });
+
+    // Update new members.
     const newMemberIds = ids.filter((id) => !(id in existingMembers));
     let newMembers = {};
-
     if (newMemberIds.length > 0) {
       const newMemberList = await this.getMembersById(newMemberIds);
       newMembers = newMemberList.reduce((result, member) => {
-        result[member.id] = { played: 0, upcoming: 0, elo: member.elo };
+        result[member.id] = {
+          played: 0,
+          upcoming: 0,
+          elo: member.elo,
+          canPlay: true,
+        };
         return result;
       }, {} as IDBySessionMember);
     }
 
     try {
       await set(ref(getDatabase(), 'members'), {
-        ...existingMembers,
+        ...updatedExistingMembers,
         ...newMembers,
       });
     } catch (e) {
@@ -294,10 +310,14 @@ const firebaseImpl: Firebase = {
       sessionId,
     });
   },
-  
-  listenToGameResults(listener: (gameResults: {win: GameResultTeam, lose: GameResultTeam}[]) => void) {
+
+  listenToGameResults(
+    listener: (
+      gameResults: { win: GameResultTeam; lose: GameResultTeam }[]
+    ) => void
+  ) {
     return onValue(ref(getDatabase(), GAME_RESULT_KEY), (snapshot) => {
-      const gameResults: {win: GameResultTeam, lose: GameResultTeam}[] = [];
+      const gameResults: { win: GameResultTeam; lose: GameResultTeam }[] = [];
       snapshot.forEach((gameResultSnapshot) => {
         gameResults.push({
           win: gameResultSnapshot.val().win,

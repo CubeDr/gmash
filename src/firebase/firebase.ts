@@ -44,7 +44,11 @@ export default interface Firebase {
   ) => Unsubscribe;
 
   addGameResult: (win: GameResultTeam, lose: GameResultTeam) => Promise<void>;
-  listenToGameResults: (listener: (gameResults: {win: GameResultTeam, lose: GameResultTeam}[]) => void) => Unsubscribe;
+  listenToGameResults: (
+    listener: (
+      gameResults: { win: GameResultTeam; lose: GameResultTeam }[]
+    ) => void
+  ) => Unsubscribe;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   update: (ref: DatabaseReference, value: any) => Promise<void>;

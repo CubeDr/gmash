@@ -11,14 +11,19 @@ export default function useSelectedMembers() {
 
   useEffect(() => {
     const unsubscribe = firebase.listenToSessionMembers((sessionMemberMap) => {
-      const selected = sessionMemberMap && members
-        ? members
-          .filter((member) => member.id in sessionMemberMap)
-          .map((member) => {
-            const sessionInfo = sessionMemberMap[member.id];
-            return { ...member, ...sessionInfo };
-          })
-        : [];
+      const selected =
+        sessionMemberMap && members
+          ? members
+              .filter(
+                (member) =>
+                  member.id in sessionMemberMap &&
+                  sessionMemberMap[member.id].canPlay
+              )
+              .map((member) => {
+                const sessionInfo = sessionMemberMap[member.id];
+                return { ...member, ...sessionInfo };
+              })
+          : [];
 
       setSessionMembers(selected);
     });
