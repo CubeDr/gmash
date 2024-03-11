@@ -44,7 +44,7 @@ export default function HomePage() {
           queryParams.get(EDIT_SESSION_QUERY_PARAM) === 'true'
         ) {
           const players = Object.keys(membersMap).filter((key) => {
-            const { upcoming } = membersMap[key];
+            const { upcoming = 0 } = membersMap[key];
             return upcoming > 0;
           });
           setParticipantIds(new Set(players));

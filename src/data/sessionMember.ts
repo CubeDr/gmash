@@ -1,6 +1,6 @@
 export default interface SessionMember {
-  played: number;
-  upcoming: number;
+  played?: number;
+  upcoming?: number;
   elo: number;
   canPlay: boolean;
 }
