@@ -33,6 +33,25 @@
   color: white;
 }
 
+.Ranking {
+  background: white;
+  border-radius: 18px;
+  margin: 48px 48px 8px;
+  padding: 24px;
+}
+
+.RankingTitle {
+  color: var(--theme-color-3);
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.RankingItem {
+  display: block;
+  line-height: 24px;
+}
+
 .MembersContainer {
   flex-grow: 1;
   overflow-y: scroll;

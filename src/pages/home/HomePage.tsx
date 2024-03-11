@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Members from '../../components/members/Members';
 import firebase from '../../firebase';
 import googlerService from '../../services/googlerService';
+import membersService from '../../services/membersService';
 import useStream from '../../useStream';
 
 import styles from './HomePage.module.css';
@@ -24,6 +25,7 @@ export default function HomePage() {
   // Participant IDs for SessionMembers involved in upcoming games.
   const [participantIds, setParticipantIds] = useState<Set<string>>(new Set());
   const [showElo, setShowElo] = useState(false);
+  const ranking = useStream(membersService.membersStream.map(members => Array.from(members).sort((a, b) => b.elo - a.elo).slice(0, 5)));
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -140,6 +142,14 @@ export default function HomePage() {
           onClick={() => setShowElo((showElo) => !showElo)}
         >
           Toggle Elo
+        </div>
+      )}
+      {showMembers() && (
+        <div className={styles.Ranking}>
+          <span className={styles.RankingTitle}>Ranking</span>
+          {ranking?.map((member, i) => (
+            <span className={styles.RankingItem} key={member.id + ':' + i}>{i + 1}. {member.name}</span>
+          ))}
         </div>
       )}
       {showMembers() && (
