@@ -1,5 +1,6 @@
 import Game from '../data/game';
 import Member from '../data/member';
+import { IDBySessionMember } from '../data/sessionMember';
 import firebase from '../firebase';
 import TypedStream from '../typedStream';
 
@@ -11,32 +12,17 @@ class SessionMembersService {
   readonly sessionMembersStream = new TypedStream<Member[]>();
   readonly playingMembersIdsStream = new TypedStream<Set<string>>();
   private members: Member[] = [];
+  private sessionMembersMap: IDBySessionMember = {};
 
   constructor() {
     membersService.membersStream.on((members) => {
       this.members = members;
+      this.setSessionMembers();
     });
 
     firebase.listenToSessionMembers((sessionMembersMap) => {
-      const sessionMembers =
-        sessionMembersMap && this.members
-          ? this.members
-              .filter(
-                (member) =>
-                  member.id in sessionMembersMap &&
-                  sessionMembersMap[member.id].canPlay
-              )
-              .map((member) => {
-                const sessionInfo = sessionMembersMap[member.id];
-                // To use real time data, it must be overwritten with the sessionInfo value.
-                const updatedMember = { ...member, ...sessionInfo };
-                this.idToMemberMap.set(updatedMember.id, updatedMember);
-
-                return updatedMember;
-              })
-          : [];
-
-      this.sessionMembersStream.write(sessionMembers);
+      this.sessionMembersMap = sessionMembersMap;
+      this.setSessionMembers();
     });
 
     gameService.playingGamesStream.on((playingGames) => {
@@ -45,42 +31,100 @@ class SessionMembersService {
     });
 
     gameService.playedGamesStream.on((playedGames) => {
-      const playedMemberIds = this.getMemberIdsFromGames(playedGames);
-      playedMemberIds.map((id) => {
-        this.setMemberById(id, 'played');
+      const playedMemberCounts = this.getMemberIdsCountfromGames(playedGames);
+      Object.entries(playedMemberCounts).map(([id, count]) => {
+        this.setMemberById(id, 'played', count);
       });
       this.sessionMembersStream.write(this.getConvertedMap());
     });
 
     gameService.upcomingGamesStream.on((upcomingGames) => {
-      const upcomingMemberIds = this.getMemberIdsFromGames(upcomingGames);
-      upcomingMemberIds.map((id) => {
-        this.setMemberById(id, 'upcoming');
+      const upcomingMemberCounts =
+        this.getMemberIdsCountfromGames(upcomingGames);
+      Object.entries(upcomingMemberCounts).map(([id, count]) => {
+        this.setMemberById(id, 'upcoming', count);
       });
       this.sessionMembersStream.write(this.getConvertedMap());
     });
+  }
+
+  private setSessionMembers() {
+    if (!this.members || !this.sessionMembersMap) {
+      return;
+    }
+    const sessionMembers = this.members
+      .filter(
+        (member) =>
+          member.id in this.sessionMembersMap &&
+          this.sessionMembersMap[member.id].canPlay
+      )
+      .map((member) => {
+        const sessionInfo = this.sessionMembersMap[member.id];
+        const prevMember = this.idToMemberMap.get(member.id);
+        // To use real time data, it must be overwritten with the sessionInfo value.
+        const updatedMember = {
+          ...member,
+          ...sessionInfo,
+          played: prevMember?.played ?? 0,
+          upcoming: prevMember?.upcoming ?? 0,
+        };
+        this.idToMemberMap.set(updatedMember.id, updatedMember);
+
+        return updatedMember;
+      });
+    this.sessionMembersStream.write(sessionMembers);
   }
 
   getMemberById(id: string) {
     return this.idToMemberMap.get(id);
   }
 
-  setMemberById(id: string, gameProperty: 'played' | 'upcoming') {
+  private setMemberById(
+    id: string,
+    gameProperty: 'played' | 'upcoming',
+    count: number
+  ) {
     const prev = this.getMemberById(id);
     this.idToMemberMap.set(id, {
       ...prev,
-      [gameProperty]: prev?.[gameProperty] ?? 0 + 1,
+      [gameProperty]: count,
     } as Member);
   }
 
-  getConvertedMap() {
-    return Object.values(this.idToMemberMap);
+  private compareById(a: Member, b: Member) {
+    if (!a || !b) {
+      return 0;
+    }
+    const aId = a.id;
+    const bId = b.id;
+    if (aId < bId) {
+      return -1;
+    } else if (aId > bId) {
+      return 1;
+    }
+    return 0;
   }
 
-  getMemberIdsFromGames(games: Game[] = []): string[] {
+  private getConvertedMap() {
+    return Array.from(this.idToMemberMap.values()).sort(this.compareById);
+  }
+
+  private getMemberIdsFromGames(games: Game[] = []): string[] {
     return games
       .flatMap((game) => [...game.team1, ...game.team2])
       .map((member) => member.id);
+  }
+
+  private getMemberIdsCountfromGames(games: Game[] = []): {
+    [key: string]: number;
+  } {
+    return this.counter(this.getMemberIdsFromGames(games));
+  }
+
+  private counter(array: string[]) {
+    const count: { [key: string]: number } = {};
+    array.forEach((val) => (count[val] = (count[val] || 0) + 1));
+    return count;
   }
 }
 
