@@ -31,6 +31,14 @@ export default class TypedStream<T> {
   }
 
   remove(listener: Listener<T>) {
-    this.stream.off('data', listener);
+      this.stream.off('data', listener);
+  }
+
+  map<U>(mapper: (value: T) => U): TypedStream<U> {
+      const stream = new TypedStream<U>();
+      this.on((value) => {
+          stream.write(mapper(value));
+      });
+      return stream;
   }
 }
