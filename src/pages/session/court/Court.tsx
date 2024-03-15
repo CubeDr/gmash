@@ -17,7 +17,13 @@ export default function Court({ game, playingMemberIds, onClick }: CourtProps) {
       <div className={styles.CourtContent}>
         <div className={styles.Team}>
           {game.team1.map((member) => (
-            <span key={member.id} className={styles.Player + (playingMemberIds?.has(member.id) ? (' ' + styles.Playing) : '')}>
+            <span
+              key={member.id}
+              className={
+                styles.Player +
+                (playingMemberIds?.has(member.id) ? ' ' + styles.Playing : '')
+              }
+            >
               {member.name}
             </span>
           ))}
@@ -25,7 +31,13 @@ export default function Court({ game, playingMemberIds, onClick }: CourtProps) {
         <hr className={styles.Divider} />
         <div className={styles.Team}>
           {game.team2.map((member) => (
-            <span key={member.id} className={styles.Player + (playingMemberIds?.has(member.id) ? (' ' + styles.Playing) : '')}>
+            <span
+              key={member.id}
+              className={
+                styles.Player +
+                (playingMemberIds?.has(member.id) ? ' ' + styles.Playing : '')
+              }
+            >
               {member.name}
             </span>
           ))}

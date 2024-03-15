@@ -20,7 +20,9 @@ export default function MemberItem({
       className={styles.Member + ' ' + (isSelected ? styles.Selected : '')}
       onClick={() => onClick(member)}
     >
-      <div className={styles.MemberRow + (isPlaying ? (' ' + styles.Playing) : '')}>
+      <div
+        className={styles.MemberRow + (isPlaying ? ' ' + styles.Playing : '')}
+      >
         <span>{member.name}</span>
         {/* <span>{member.elo}</span> */}
       </div>

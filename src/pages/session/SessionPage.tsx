@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 
 import Member from '../../data/member';
 import firebase from '../../firebase';
-import gameService from '../../services/gameService';
 import googlerService from '../../services/googlerService';
+import sessionMembersService from '../../services/sessionMembersService';
 import useStream from '../../useStream';
 
 import GameDialog from './GameDialog/GameDialog';
@@ -14,11 +14,10 @@ import MemberItem from './memberItem/MemberItem';
 import PlayingGames from './playingGames/PlayingGames';
 import RecommendedGames from './recommendedGames/RecommendedGames';
 import UpcomingGames from './upcomingGames/UpcomingGames';
-import useSessionMembers from './useSessionMembers';
 
 export default function SessionPage() {
   const googler = useStream(googlerService.googlerStream);
-  const { members } = useSessionMembers();
+  const members = useStream(sessionMembersService.sessionMembersStream);
   const [selectedMembers, setSelectedMembers] = useState<Set<Member>>(
     new Set()
   );
@@ -26,16 +25,8 @@ export default function SessionPage() {
   const [openCloseSessionDialog, setOpenCloseSessionDialog] = useState(false);
   const navigate = useNavigate();
 
-  const playingGames = useStream(gameService.playingGamesStream);
-  const [playingMemberIds, setPlayingMemberIds] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    if (playingGames == null) return;
-
-    setPlayingMemberIds(new Set(
-      playingGames.flatMap(game => ([...game.team1.map(member => member.id), ...game.team2.map(member => member.id)]))
-    ));
-  }, [playingGames]);
+  const playingMemberIds =
+    useStream(sessionMembersService.playingMembersIdsStream) ?? new Set();
 
   function makeGameFromSelectedMembers() {
     const sorted = Array.from(selectedMembers).sort((a, b) => b.elo - a.elo);
@@ -92,7 +83,7 @@ export default function SessionPage() {
       <h4 className={styles.SectionTitle}>Upcoming</h4>
       <UpcomingGames playingMemberIds={playingMemberIds} />
       <h4 className={styles.SectionTitle}>Recommended</h4>
-      <RecommendedGames  playingMemberIds={playingMemberIds} />
+      <RecommendedGames playingMemberIds={playingMemberIds} />
       <div className={styles.MembersTab}>
         <h4 className={styles.SectionTitle}>Members</h4>
         {showSessionEditButton() && (
@@ -109,15 +100,16 @@ export default function SessionPage() {
         )}
       </div>
       <div className={styles.Members}>
-        {members.map((member) => (
-          <MemberItem
-            key={member.id}
-            member={member}
-            isSelected={selectedMembers.has(member)}
-            isPlaying={playingMemberIds.has(member.id)}
-            onClick={onMemberClick}
-          />
-        ))}
+        {members &&
+          members.map((member) => (
+            <MemberItem
+              key={member.id}
+              member={member}
+              isSelected={selectedMembers.has(member)}
+              isPlaying={playingMemberIds.has(member.id)}
+              onClick={onMemberClick}
+            />
+          ))}
       </div>
       {selectedMembers.size > 0 && (
         <Button

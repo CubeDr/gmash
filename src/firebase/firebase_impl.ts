@@ -194,8 +194,6 @@ const firebaseImpl: Firebase = {
       const newMemberList = await this.getMembersById(newMemberIds);
       newMembers = newMemberList.reduce((result, member) => {
         result[member.id] = {
-          played: 0,
-          upcoming: 0,
           elo: member.elo,
           canPlay: true,
         };

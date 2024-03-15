@@ -17,7 +17,11 @@ interface GameRowProps {
   };
 }
 
-export default function GameRow({ games, playingMemberIds, dialog }: GameRowProps) {
+export default function GameRow({
+  games,
+  playingMemberIds,
+  dialog,
+}: GameRowProps) {
   const googler = useStream(googlerService.googlerStream);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
 
