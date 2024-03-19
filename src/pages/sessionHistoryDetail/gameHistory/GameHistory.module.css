@@ -1,0 +1,24 @@
+.GameItem {
+    border-bottom: 1px solid white;
+    display: flex;
+    flex-direction: row;
+    padding: 14px 4px;
+}
+
+.Members {
+    flex: 2 1 0;
+}
+
+.Score {
+    flex: 1 1 0;
+    font-size: 24px;
+    margin: 4px;
+}
+
+.Win {
+    text-align: right;
+}
+
+.Lose {
+    text-align: left;
+}

@@ -36,7 +36,7 @@ import {
 import Member from '../data/member';
 import { IDBySessionMember } from '../data/sessionMember';
 
-import Firebase, { GameResultTeam } from './firebase';
+import Firebase, { GameResult, GameResultTeam } from './firebase';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDaVS0MghioqcmFTBdwNrdV9P5Zpu2ilUs',
@@ -334,6 +334,11 @@ const firebaseImpl: Firebase = {
   delete(ref) {
     maybeInitialize();
     return remove(ref);
+  },
+
+  async getGameResultsForSession(sessionId: string): Promise<GameResult[]> {
+    const snapshot = await getDoc(doc(getFirestore(), 'session', sessionId));
+    return snapshot.data()?.gameResult as GameResult[];
   },
 };
 

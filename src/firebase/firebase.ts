@@ -5,6 +5,10 @@ import { Googler } from '../data/googler';
 import Member from '../data/member';
 import { IDBySessionMember } from '../data/sessionMember';
 
+export interface GameResult {
+  win: GameResultTeam;
+  lose: GameResultTeam;
+}
 export interface GameResultTeam {
   playersId: string[];
   score: number;
@@ -53,4 +57,6 @@ export default interface Firebase {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   update: (ref: DatabaseReference, value: any) => Promise<void>;
   delete: (ref: DatabaseReference) => Promise<void>;
+
+  getGameResultsForSession: (sessionId: string) => Promise<GameResult[]>;
 }
