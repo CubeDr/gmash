@@ -22,11 +22,5 @@
 }
 
 .Playing {
-  animation: blink-effect 1.5s infinite;
-}
-
-@keyframes blink-effect {
-  50% {
-    opacity: 0;
-  }
+  color: lightgrey;
 }
