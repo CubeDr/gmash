@@ -8,8 +8,7 @@ export default function SessionHistoryDetailPage() {
 
   return (
     <div>
-      <h1 className={styles.Title}>Session History Detail Page of {id} </h1>
-      <h2 className={styles.Title}>Game History</h2>
+      <h1 className={styles.Title}>Game History</h1>
       {id && <GameHistory sessionId={id} />}
     </div>
   );

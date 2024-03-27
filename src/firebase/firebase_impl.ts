@@ -36,7 +36,11 @@ import {
 import Member from '../data/member';
 import { IDBySessionMember } from '../data/sessionMember';
 
-import Firebase, { GameResult, GameResultTeam } from './firebase';
+import Firebase, {
+  GameResult,
+  GameResultTeam,
+  SessionHistory,
+} from './firebase';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDaVS0MghioqcmFTBdwNrdV9P5Zpu2ilUs',
@@ -66,6 +70,19 @@ function snapshotToMembers(snapshot: QuerySnapshot) {
   });
 
   return members;
+}
+
+function snapshotToSessionHistory(snapshot: QuerySnapshot) {
+  const history: SessionHistory[] = [];
+  snapshot.forEach((doc) => {
+    history.push({
+      id: doc.id,
+      players: doc.data().members ?? [],
+      timestamp: Number(doc.data().id),
+    });
+  });
+
+  return history;
 }
 
 type GameCategory = 'upcoming' | 'playing';
@@ -339,6 +356,12 @@ const firebaseImpl: Firebase = {
   async getGameResultsForSession(sessionId: string): Promise<GameResult[]> {
     const snapshot = await getDoc(doc(getFirestore(), 'session', sessionId));
     return snapshot.data()?.gameResult as GameResult[];
+  },
+
+  async getSessionHistoryList(): Promise<SessionHistory[]> {
+    maybeInitialize();
+    const snapshot = await getDocs(collection(getFirestore(), 'session'));
+    return snapshotToSessionHistory(snapshot);
   },
 };
 

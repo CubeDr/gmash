@@ -13,6 +13,12 @@ export interface GameResultTeam {
   playersId: string[];
   score: number;
 }
+
+export interface SessionHistory {
+  players: string[];
+  timestamp: number;
+  id: string;
+}
 export default interface Firebase {
   signIn: () => void;
   signOut: () => void;
@@ -59,4 +65,6 @@ export default interface Firebase {
   delete: (ref: DatabaseReference) => Promise<void>;
 
   getGameResultsForSession: (sessionId: string) => Promise<GameResult[]>;
+  // TODO: support pagination
+  getSessionHistoryList: () => Promise<SessionHistory[]>;
 }
