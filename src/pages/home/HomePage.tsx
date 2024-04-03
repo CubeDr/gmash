@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import Members from '../../components/members/Members';
+import Member from '../../data/member';
 import firebase from '../../firebase';
 import googlerService from '../../services/googlerService';
 import membersService from '../../services/membersService';
@@ -16,6 +17,7 @@ const EDIT_SESSION_QUERY_PARAM = 'edit_session';
 export default function HomePage() {
   const queryParams = new URLSearchParams(useLocation().search);
   const googler = useStream(googlerService.googlerStream);
+  const members = useStream(membersService.membersStream);
   const [isSelectingMember, setIsSelectingMember] = useState(false);
   const [isSessionOpen, setIsSessionOpen] = useState<boolean | null>(null);
   const [selectedMemberIds, setSelectedMemberIds] = useState<Set<string>>(
@@ -25,7 +27,7 @@ export default function HomePage() {
   // Participant IDs for SessionMembers involved in upcoming games.
   const [participantIds, setParticipantIds] = useState<Set<string>>(new Set());
   const [showElo, setShowElo] = useState(false);
-  const ranking = useStream(membersService.membersStream.map(members => Array.from(members).sort((a, b) => b.elo - a.elo).slice(0, 5)));
+  const [ranking, setRanking] = useState<Member[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,6 +57,16 @@ export default function HomePage() {
       });
     }
   }, [isSessionOpen]);
+
+  useEffect(() => {
+    if (members) {
+      setRanking(
+        Array.from(members)
+          .sort((a, b) => b.elo - a.elo)
+          .slice(0, 5)
+      );
+    }
+  }, [members]);
 
   function showMembers() {
     return googler != null;
@@ -144,11 +156,13 @@ export default function HomePage() {
           Toggle Elo
         </div>
       )}
-      {showMembers() && (
+      {showMembers() && ranking && (
         <div className={styles.Ranking}>
           <span className={styles.RankingTitle}>Ranking</span>
           {ranking?.map((member, i) => (
-            <span className={styles.RankingItem} key={member.id + ':' + i}>{i + 1}. {member.name}</span>
+            <span className={styles.RankingItem} key={member.id + ':' + i}>
+              {i + 1}. {member.name}
+            </span>
           ))}
         </div>
       )}
