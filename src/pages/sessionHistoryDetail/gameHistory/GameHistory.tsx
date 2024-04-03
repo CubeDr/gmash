@@ -39,6 +39,7 @@ export default function GameHistory({ sessionId }: Props) {
       setGameItems(gameResults?.map(gameResultToGameItem));
     });
   }, [sessionId]);
+
   return (
     <>
       {gameItems.map((gameItem, i) => (

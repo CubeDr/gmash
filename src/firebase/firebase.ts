@@ -19,6 +19,7 @@ export interface SessionHistory {
   timestamp: number;
   id: string;
 }
+
 export default interface Firebase {
   signIn: () => void;
   signOut: () => void;
