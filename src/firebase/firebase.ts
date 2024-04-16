@@ -27,6 +27,7 @@ export default interface Firebase {
   register: (id: string, name: string) => Promise<void>;
   getGoogler: (user: User) => Promise<Googler>;
   updateGoogler: (id: string, elo: number) => Promise<void>;
+  addNewGoogler: (name: string, elo: number) => Promise<void>;
   getAllMembers: () => Promise<Member[]>;
   getMembersById: (ids: string[]) => Promise<Member[]>;
 
