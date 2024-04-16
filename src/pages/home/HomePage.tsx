@@ -171,18 +171,20 @@ export default function HomePage() {
           ))}
         </div>
       )}
+      {isOrganizer() && (
+        <div className={styles.NewMemberButtonWrapper}>
+          <Button
+            size="small"
+            className={styles.NewMemberButton}
+            onClick={() => {
+              setIsMemberDialogShown(true);
+            }}
+          >
+            Add New Member
+          </Button>
+        </div>
+      )}
 
-      <div className={styles.OrganizerButtonGroup}>
-        <Button
-          size="small"
-          className={styles.NewMemberButton}
-          onClick={() => {
-            setIsMemberDialogShown(true);
-          }}
-        >
-          Add New Member
-        </Button>
-      </div>
       {showMembers() && (
         <div className={styles.MembersContainer}>
           <Members

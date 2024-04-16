@@ -19,7 +19,7 @@
   text-align: center;
 }
 
-.OrganizerButtonGroup {
+.NewMemberButtonWrapper {
   display: flex;
   justify-content: flex-end;
   padding: 8px 8px 0px;
