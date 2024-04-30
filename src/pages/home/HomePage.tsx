@@ -1,4 +1,5 @@
 import { Button } from '@mui/material';
+import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -11,6 +12,7 @@ import useStream from '../../useStream';
 
 import styles from './HomePage.module.css';
 import googleSignIn from './google_signin.png';
+import MemberDialog from './memberDialog/memberDialog';
 
 const EDIT_SESSION_QUERY_PARAM = 'edit_session';
 
@@ -28,6 +30,7 @@ export default function HomePage() {
   const [participantIds, setParticipantIds] = useState<Set<string>>(new Set());
   const [showElo, setShowElo] = useState(false);
   const [ranking, setRanking] = useState<Member[]>([]);
+  const [isMemberDialogShown, setIsMemberDialogShown] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -80,7 +83,7 @@ export default function HomePage() {
     return googler != null && googler.name == null;
   }
 
-  function showEloToggle() {
+  function isOrganizer() {
     return googler?.role === 'organizer';
   }
 
@@ -146,12 +149,14 @@ export default function HomePage() {
   return (
     <div className={styles.HomePage}>
       <div className={styles.Title}>GMASH</div>
-      {showEloToggle() && (
+      {isOrganizer() && (
         <div
-          className={
-            styles.EloToggle + (showElo ? ' ' + styles.EloToggleOff : '')
-          }
-          onClick={() => setShowElo((showElo) => !showElo)}
+          className={classNames(`${styles.EloToggle}`, {
+            [`${styles.EloToggleOff}`]: showElo,
+          })}
+          onClick={() => {
+            setShowElo((showElo) => !showElo);
+          }}
         >
           Toggle Elo
         </div>
@@ -166,6 +171,20 @@ export default function HomePage() {
           ))}
         </div>
       )}
+      {isOrganizer() && (
+        <div className={styles.NewMemberButtonWrapper}>
+          <Button
+            size="small"
+            className={styles.NewMemberButton}
+            onClick={() => {
+              setIsMemberDialogShown(true);
+            }}
+          >
+            Add New Member
+          </Button>
+        </div>
+      )}
+
       {showMembers() && (
         <div className={styles.MembersContainer}>
           <Members
@@ -241,6 +260,12 @@ export default function HomePage() {
           </Button>
         )}
       </div>
+      <MemberDialog
+        open={isMemberDialogShown}
+        onClose={() => {
+          setIsMemberDialogShown(false);
+        }}
+      ></MemberDialog>
     </div>
   );
 }

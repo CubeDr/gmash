@@ -19,6 +19,12 @@
   text-align: center;
 }
 
+.NewMemberButtonWrapper {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 8px 0px;
+}
+
 .EloToggle {
   background: white;
   border-radius: 30px;
@@ -31,6 +37,12 @@
 .EloToggleOff {
   background: var(--theme-color-5);
   color: white;
+}
+
+.NewMemberButton{
+  background: white;
+  border-radius: 30px;
+  margin-left: 3px;
 }
 
 .Ranking {

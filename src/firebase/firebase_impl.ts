@@ -171,6 +171,16 @@ const firebaseImpl: Firebase = {
     return await updateDoc(doc(getFirestore(), 'googlers', id), { elo: elo });
   },
 
+  async addNewGoogler(name: string, elo: number) {
+    maybeInitialize();
+    return setDoc(doc(getFirestore(), 'googlers', name), {
+      name,
+      initial_elo: elo,
+      elo,
+      role: 'member',
+    });
+  },
+
   async getAllMembers() {
     maybeInitialize();
     const snapshot = await getDocs(collection(getFirestore(), 'googlers'));
